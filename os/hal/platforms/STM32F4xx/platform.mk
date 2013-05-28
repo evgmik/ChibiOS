@@ -2,6 +2,7 @@
 PLATFORMSRC = ${CHIBIOS}/os/hal/platforms/STM32F4xx/stm32_dma.c \
               ${CHIBIOS}/os/hal/platforms/STM32F4xx/hal_lld.c \
               ${CHIBIOS}/os/hal/platforms/STM32F4xx/adc_lld.c \
+              ${CHIBIOS}/os/hal/platforms/STM32F4xx/dac_lld.c \
               ${CHIBIOS}/os/hal/platforms/STM32F4xx/ext_lld_isr.c \
               ${CHIBIOS}/os/hal/platforms/STM32/can_lld.c \
               ${CHIBIOS}/os/hal/platforms/STM32/ext_lld.c \
@@ -11,7 +12,7 @@ PLATFORMSRC = ${CHIBIOS}/os/hal/platforms/STM32F4xx/stm32_dma.c \
               ${CHIBIOS}/os/hal/platforms/STM32/pwm_lld.c \
               ${CHIBIOS}/os/hal/platforms/STM32/sdc_lld.c \
               ${CHIBIOS}/os/hal/platforms/STM32/GPIOv2/pal_lld.c \
- 			  ${CHIBIOS}/os/hal/platforms/STM32/I2Cv1/i2c_lld.c \
+	      ${CHIBIOS}/os/hal/platforms/STM32/I2Cv1/i2c_lld.c \
               ${CHIBIOS}/os/hal/platforms/STM32/OTGv1/usb_lld.c \
               ${CHIBIOS}/os/hal/platforms/STM32/RTCv2/rtc_lld.c \
               ${CHIBIOS}/os/hal/platforms/STM32/SPIv1/spi_lld.c \
