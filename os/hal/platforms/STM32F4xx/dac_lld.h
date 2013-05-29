@@ -303,6 +303,8 @@ extern "C" {
   void dac_lld_start(DACDriver *dacp);
   void dac_lld_stop(DACDriver *dacp);
   void dac_lld_send(DACDriver *dacp, size_t n, const void *txbuf);
+  void dac_lld_send_circular(DACDriver *dacp, size_t n, const void *txbuf);
+  void dac_lld_send_doublebuffer(DACDriver *dacp, size_t n, const void *txbuf0, const void *txbuf1);
 #ifdef __cplusplus
 }
 #endif

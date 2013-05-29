@@ -345,7 +345,7 @@
 #define rccEnableDAC(lp) rccEnableAPB1(RCC_APB1ENR_DACEN, lp)
 
 /**
- * @brief   Disables the ADC3 peripheral clock.
+ * @brief   Disables the DAC peripheral clock.
  *
  * @param[in] lp        low power enable flag
  *
@@ -354,7 +354,7 @@
 #define rccDisableDAC(lp) rccDisableAPB1(RCC_APB1ENR_DACEN, lp)
 
 /**
- * @brief   Resets the ADC3 peripheral.
+ * @brief   Resets the DAC peripheral.
  *
  * @api
  */

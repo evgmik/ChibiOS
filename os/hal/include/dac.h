@@ -111,9 +111,9 @@ typedef enum {
 }
 
 /**
- * @brief   Sends data over the DAC bus.
+ * @brief   Sends data over the DAC bus using a circular buffer.
  * @details This asynchronous function starts a transmit operation.
- * @post    At the end of the operation the configured callback is invoked.
+ * @post    At the end of each cycle the configured callback is invoked.
  *
  * @param[in] dacp      pointer to the @p DACDriver object
  * @param[in] n         number of words to send
@@ -124,6 +124,23 @@ typedef enum {
 #define dacStartSendCircularI(dacp, n, txbuf) {                                     \
   (dacp)->state = DAC_ACTIVE;                                               \
   dac_lld_send_circular(dacp, n, txbuf);                                             \
+}
+
+/**
+ * @brief   Sends data over the DAC bus using 2 buffers.
+ * @details This asynchronous function starts a transmit operation.
+ * @post    At the end of each cycle the configured callback is invoked.
+ *
+ * @param[in] dacp      pointer to the @p DACDriver object
+ * @param[in] n         number of words to send. Must be the same for both buffers
+ * @param[in] txbuf0     the pointer to the first transmit buffer
+ * @param[in] txbuf1     the pointer to the second transmit buffer
+ *
+ * @iclass
+ */
+#define dacStartSendDoubleBufferI(dacp, n, txbuf0, txbuf1) {                                     \
+  (dacp)->state = DAC_ACTIVE;                                               \
+  dac_lld_send_doublebuffer(dacp, n, txbuf0, txbuf1);                                             \
 }
 
 /**
@@ -230,6 +247,7 @@ extern "C" {
   void dacStop(DACDriver *dacp);
   void dacStartSend(DACDriver *dacp, size_t n, const void *txbuf);
   void dacStartSendCircular(DACDriver *dacp, size_t n, const void *txbuf);
+  void dacStartSendDoubleBuffer(DACDriver *dacp, size_t n, const void *txbuf0,  const void *txbuf1);
 #if DAC_USE_WAIT
   void dacSend(DACDriver *dacp, size_t n, const void *txbuf);
 #endif /* DAC_USE_WAIT */
