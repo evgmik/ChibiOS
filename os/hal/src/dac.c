@@ -153,6 +153,28 @@ void dacStartSend(DACDriver *dacp, size_t n, const void *txbuf) {
   chSysUnlock();
 }
 
+/**
+ * @brief   Sends data over the DAC bus.
+ * @details This asynchronous function starts a transmit operation.
+ * @post    At the end of the operation the configured callback is invoked.
+ *
+ * @param[in] dacp      pointer to the @p DACDriver object
+ * @param[in] n         number of words to send
+ * @param[in] txbuf     the pointer to the transmit buffer
+ *
+ * @api
+ */
+void dacStartSendCircular(DACDriver *dacp, size_t n, const void *txbuf) {
+
+  chDbgCheck((dacp != NULL) && (n > 0) && (txbuf != NULL),
+             "dacStartSend");
+
+  chSysLock();
+  chDbgAssert(dacp->state == DAC_READY, "dacStartSendCircularI(), #1", "not ready");
+  dacStartSendCircularI(dacp, n, txbuf);
+  chSysUnlock();
+}
+
 #if DAC_USE_WAIT || defined(__DOXYGEN__)
 
 /**

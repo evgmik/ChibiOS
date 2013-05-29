@@ -111,6 +111,22 @@ typedef enum {
 }
 
 /**
+ * @brief   Sends data over the DAC bus.
+ * @details This asynchronous function starts a transmit operation.
+ * @post    At the end of the operation the configured callback is invoked.
+ *
+ * @param[in] dacp      pointer to the @p DACDriver object
+ * @param[in] n         number of words to send
+ * @param[in] txbuf     the pointer to the transmit buffer
+ *
+ * @iclass
+ */
+#define dacStartSendCircularI(dacp, n, txbuf) {                                     \
+  (dacp)->state = DAC_ACTIVE;                                               \
+  dac_lld_send_circular(dacp, n, txbuf);                                             \
+}
+
+/**
  * @name    Low Level driver helper macros
  * @{
  */
@@ -213,6 +229,7 @@ extern "C" {
   void dacStart(DACDriver *dacp, const DACConfig *config);
   void dacStop(DACDriver *dacp);
   void dacStartSend(DACDriver *dacp, size_t n, const void *txbuf);
+  void dacStartSendCircular(DACDriver *dacp, size_t n, const void *txbuf);
 #if DAC_USE_WAIT
   void dacSend(DACDriver *dacp, size_t n, const void *txbuf);
 #endif /* DAC_USE_WAIT */
