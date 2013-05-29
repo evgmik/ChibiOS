@@ -133,7 +133,7 @@ void dacStop(DACDriver *dacp) {
 
 /**
  * @brief   Sends data over the DAC bus.
- * @details This asynchronous function starts a transmit operation.
+ * @details This asynchronous function starts a one-shot transmit operation.
  * @post    At the end of the operation the configured callback is invoked.
  *
  * @param[in] dacp      pointer to the @p DACDriver object
@@ -155,8 +155,8 @@ void dacStartSend(DACDriver *dacp, size_t n, const void *txbuf) {
 
 /**
  * @brief   Sends data over the DAC bus.
- * @details This asynchronous function starts a transmit operation.
- * @post    At the end of the operation the configured callback is invoked.
+ * @details This asynchronous function starts a continuous transmit operation.
+ * @post    At the end of each cycle the configured callback is invoked.
  *
  * @param[in] dacp      pointer to the @p DACDriver object
  * @param[in] n         number of words to send
@@ -167,7 +167,7 @@ void dacStartSend(DACDriver *dacp, size_t n, const void *txbuf) {
 void dacStartSendCircular(DACDriver *dacp, size_t n, const void *txbuf) {
 
   chDbgCheck((dacp != NULL) && (n > 0) && (txbuf != NULL),
-             "dacStartSend");
+             "dacStartSendCircular");
 
   chSysLock();
   chDbgAssert(dacp->state == DAC_READY, "dacStartSendCircularI(), #1", "not ready");
@@ -177,8 +177,8 @@ void dacStartSendCircular(DACDriver *dacp, size_t n, const void *txbuf) {
 
 /**
  * @brief   Sends data over the DAC bus.
- * @details This asynchronous function starts a transmit operation.
- * @post    At the end of the operation the configured callback is invoked.
+ * @details This asynchronous function starts a transmit operation using a double buffer.
+ * @post    At the end of each cycle the configured callback is invoked.
  *
  * @param[in] dacp      pointer to the @p DACDriver object
  * @param[in] n         number of words to send
@@ -189,7 +189,7 @@ void dacStartSendCircular(DACDriver *dacp, size_t n, const void *txbuf) {
 void dacStartSendDoubleBuffer(DACDriver *dacp, size_t n, const void *txbuf0,  const void *txbuf1) {
 
   chDbgCheck((dacp != NULL) && (n > 0) && (txbuf0 != NULL)  && (txbuf1 != NULL),
-             "dacStartSend");
+             "dacStartSendDoubleBuffer");
 
   chSysLock();
   chDbgAssert(dacp->state == DAC_READY, "dacStartSendDoubleBufferI(), #1", "not ready");

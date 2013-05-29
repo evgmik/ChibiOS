@@ -43,7 +43,6 @@
   STM32_DMA_GETCHANNEL(STM32_DAC_CHN2_DMA_STREAM,                            \
                        STM32_DAC_CHN2_DMA_CHN)
 
-#define STM32_DAC_CHN1_CR_MASK (uint32_t)0x00000FFE
 /*===========================================================================*/
 /* Driver exported variables.                                                */
 /*===========================================================================*/
@@ -176,8 +175,8 @@ void dac_lld_start(DACDriver *dacp) {
       /* Timer start.*/
       dacp->tim->CR1  = TIM_CR1_CEN;
       /* DAC configuration */
-      dacp->dac->CR |= (dacp->dac->CR & ~STM32_DAC_CHN1_CR_MASK) |            \
-                        (STM32_DAC_CR_EN | STM32_DAC_CR_DMAEN |               \
+      dacp->dac->CR |= (dacp->dac->CR & ~STM32_DAC1_CHN1_CR_MASK) |            \
+                        (STM32_DAC1_CR_EN | STM32_DAC1_CR_DMAEN |               \
                          dacp->config->cr_flags);
       /* DMA setup. */
       b = dmaStreamAllocate(dacp->dma,
@@ -224,8 +223,74 @@ void dac_lld_start(DACDriver *dacp) {
 #endif
 #if STM32_DAC_USE_CHN2
     if (&DACD2 == dacp) {
-      DAC->CR &= ~DAC_CR_EN2;
-      /* TODO: CHN2 */
+      bool_t b;
+      /* Timer setup */
+      rccEnableTIM7(FALSE);
+      rccResetTIM7();
+      dacp->clock = STM32_TIMCLK1;
+      arr = (dacp->clock / dacp->config->frequency);
+      chDbgAssert((arr <= 0xFFFF) &&
+              (arr * dacp->config->frequency) == dacp->clock,
+              "dac_lld_start(), #1", "invalid frequency");
+      
+      /* Timer configuration.*/
+      dacp->tim->CR1  = 0;                        /* Initially stopped.   */
+      dacp->tim->PSC  = 0;                        /* Prescaler value.     */
+      dacp->tim->DIER = 0;
+      dacp->tim->ARR  = arr;
+      dacp->tim->EGR  = TIM_EGR_UG;               /* Update event.        */
+      dacp->tim->CR2  &= (uint16_t)~TIM_CR2_MMS;
+      dacp->tim->CR2  |= (uint16_t)TIM_CR2_MMS_1; /* Enable TRGO updates. */
+      dacp->tim->CNT  = 0;                        /* Reset counter.       */
+      dacp->tim->SR   = 0;                        /* Clear pending IRQs.  */
+      /* Update Event IRQ enabled. */
+      /* Timer start.*/
+      dacp->tim->CR1  = TIM_CR1_CEN;
+      /* DAC configuration */
+      dacp->dac->CR |= (dacp->dac->CR & ~STM32_DAC2_CHN1_CR_MASK) |            \
+                        (STM32_DAC2_CR_EN | STM32_DAC2_CR_DMAEN |               \
+                         dacp->config->cr_flags);
+      /* DMA setup. */
+      b = dmaStreamAllocate(dacp->dma,
+                            STM32_DAC_CHN2_IRQ_PRIORITY,
+                            (stm32_dmaisr_t)dac_lld_serve_tx_interrupt,
+                            (void *)dacp);
+      chDbgAssert(!b, "dac_lld_start(), #2", "stream already allocated");
+      switch (dacp->config->dhrm) {
+      /* Sets the DAC data register */
+      case DAC_DHRM_12BIT_RIGHT:
+        dmaStreamSetPeripheral(dacp->dma, &dacp->dac->DHR12R1);
+        dacp->dmamode = (dacp->dmamode & ~STM32_DMA_CR_SIZE_MASK) |
+                          STM32_DMA_CR_PSIZE_HWORD | STM32_DMA_CR_MSIZE_HWORD;
+        break;
+      case DAC_DHRM_12BIT_LEFT:
+        dmaStreamSetPeripheral(dacp->dma, &dacp->dac->DHR12L1);
+        dacp->dmamode = (dacp->dmamode & ~STM32_DMA_CR_SIZE_MASK) |
+                          STM32_DMA_CR_PSIZE_HWORD | STM32_DMA_CR_MSIZE_HWORD;
+        break;
+      case DAC_DHRM_8BIT_RIGHT:
+        dmaStreamSetPeripheral(dacp->dma, &dacp->dac->DHR8R1);
+        dacp->dmamode = (dacp->dmamode & ~STM32_DMA_CR_SIZE_MASK) |
+                          STM32_DMA_CR_PSIZE_BYTE | STM32_DMA_CR_MSIZE_BYTE;
+        break;
+      case DAC_DHRM_12BIT_RIGHT_DUAL:
+        dmaStreamSetPeripheral(dacp->dma, &dacp->dac->DHR12RD);
+        dacp->dmamode = (dacp->dmamode & ~STM32_DMA_CR_SIZE_MASK) |
+                          STM32_DMA_CR_PSIZE_HWORD | STM32_DMA_CR_MSIZE_HWORD;
+        break;
+      case DAC_DHRM_12BIT_LEFT_DUAL:
+        dmaStreamSetPeripheral(dacp->dma, &dacp->dac->DHR12LD);
+        dacp->dmamode = (dacp->dmamode & ~STM32_DMA_CR_SIZE_MASK) |
+                          STM32_DMA_CR_PSIZE_HWORD | STM32_DMA_CR_MSIZE_HWORD;
+        break;
+      case DAC_DHRM_8BIT_RIGHT_DUAL:
+        dmaStreamSetPeripheral(dacp->dma, &dacp->dac->DHR8RD);
+        dacp->dmamode = (dacp->dmamode & ~STM32_DMA_CR_SIZE_MASK) |
+                         STM32_DMA_CR_PSIZE_BYTE | STM32_DMA_CR_MSIZE_BYTE;
+        break;
+      }
+
+      dacp->dac->CR |= DAC_CR_TEN2;
     }
 #endif
   }
