@@ -71,7 +71,6 @@
 #define STM32_DAC_MAMP_2047 DAC_CR_MAMP1_1 | DAC_CR_MAMP1_3
 #define STM32_DAC_MAMP_4095 DAC_CR_MAMP1_0 | DAC_CR_MAMP1_1 | DAC_CR_MAMP1_2
 
-
 /*===========================================================================*/
 /* Driver pre-compile time settings.                                         */
 /*===========================================================================*/
@@ -171,7 +170,7 @@
 #error "invalid DMA stream associated to DAC CHN1"
 #endif
 
-#if STM32_DAC_USE_DAC2 &&                                                   \
+#if STM32_DAC_USE_CHN2 &&                                                   \
     !STM32_DMA_IS_VALID_ID(STM32_DAC_CHN2_DMA_STREAM, STM32_DAC_CHN2_DMA_MSK)
 #error "invalid DMA stream associated to DAC CHN2"
 #endif

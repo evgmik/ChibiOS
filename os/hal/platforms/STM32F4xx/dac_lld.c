@@ -76,8 +76,8 @@ static void dac_lld_serve_tx_interrupt(DACDriver *dacp, uint32_t flags) {
 #if defined(STM32_DAC_DMA_ERROR_HOOK)
   (void)dacp;
   if ((flags & (STM32_DMA_ISR_TEIF | STM32_DMA_ISR_DMEIF)) != 0) {
-			/* DMA errors handling.*/
-			_dac_isr_error_code(dacp);
+		/* DMA errors handling.*/
+		_dac_isr_error_code(dacp);
   }
   else {
     if ((flags & STM32_DMA_ISR_HTIF) != 0) {
@@ -147,7 +147,7 @@ void dac_lld_init(void) {
  * @notapi
  */
 void dac_lld_start(DACDriver *dacp) {
-  uint32_t arr, regshift, trgo;
+  uint32_t arr, regshift, trgo, dataoffset;
 	bool_t b;
   /* If in stopped state then enables the DAC and DMA clocks.*/
   if (dacp->state == DAC_STOP) {
@@ -156,6 +156,7 @@ void dac_lld_start(DACDriver *dacp) {
     if (&DACD1 == dacp) {
 			/* DAC1 CR data is at bits 0:15 */
       regshift = 0;
+			dataoffset = 0;
       /* Timer setup */
       rccEnableTIM6(FALSE);
       rccResetTIM6();
@@ -166,6 +167,7 @@ void dac_lld_start(DACDriver *dacp) {
     if (&DACD2 == dacp) {
 			/* DAC2 CR data is at bits 16:31 */
       regshift = 16;
+			dataoffset = &dacp->dac->DHR12R2 - &dacp->dac->DHR12R1;
       /* Timer setup */
       rccEnableTIM7(FALSE);
       rccResetTIM7();
@@ -206,17 +208,17 @@ void dac_lld_start(DACDriver *dacp) {
 		switch (dacp->config->dhrm) {
 			/* Sets the DAC data register */
 			case DAC_DHRM_12BIT_RIGHT:
-			dmaStreamSetPeripheral(dacp->dma, &dacp->dac->DHR12R1);
+			dmaStreamSetPeripheral(dacp->dma, &dacp->dac->DHR12R1 + dataoffset);
 			dacp->dmamode = (dacp->dmamode & ~STM32_DMA_CR_SIZE_MASK) |
 						STM32_DMA_CR_PSIZE_HWORD | STM32_DMA_CR_MSIZE_HWORD;
 				break;
 			case DAC_DHRM_12BIT_LEFT:
-			dmaStreamSetPeripheral(dacp->dma, &dacp->dac->DHR12L1);
+			dmaStreamSetPeripheral(dacp->dma, &dacp->dac->DHR12L1 + dataoffset);
 			dacp->dmamode = (dacp->dmamode & ~STM32_DMA_CR_SIZE_MASK) |
 						STM32_DMA_CR_PSIZE_HWORD | STM32_DMA_CR_MSIZE_HWORD;
 				break;
 			case DAC_DHRM_8BIT_RIGHT:
-			dmaStreamSetPeripheral(dacp->dma, &dacp->dac->DHR8R1);
+			dmaStreamSetPeripheral(dacp->dma, &dacp->dac->DHR8R1 + dataoffset);
 			dacp->dmamode = (dacp->dmamode & ~STM32_DMA_CR_SIZE_MASK) |
 						STM32_DMA_CR_PSIZE_BYTE | STM32_DMA_CR_MSIZE_BYTE;
 				break;
