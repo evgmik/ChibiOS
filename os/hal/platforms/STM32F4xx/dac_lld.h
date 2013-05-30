@@ -34,73 +34,43 @@
 /*===========================================================================*/
 /* Driver constants.                                                         */
 /*===========================================================================*/
-#define STM32_DAC1_CR_EN DAC_CR_EN1
-#define STM32_DAC2_CR_EN DAC_CR_EN2
 
-#define STM32_DAC1_CHN1_CR_MASK (uint32_t)0x00000FFE
-#define STM32_DAC2_CHN1_CR_MASK (uint32_t)0x0FFE0000
+#define STM32_DAC_CR_EN DAC_CR_EN1
+#define STM32_DAC_CR_DMAEN DAC_CR_DMAEN1
+#define STM32_DAC_CR_TEN DAC_CR_TEN1
 
-#define STM32_DAC1_CR_BOFF_ENABLE    (uint32_t)0x00000000
-#define STM32_DAC1_CR_BOFF_DISABLE   DAC_CR_BOFF1
-#define STM32_DAC2_CR_BOFF_ENABLE    (uint32_t)0x00000000
-#define STM32_DAC2_CR_BOFF_DISABLE   DAC_CR_BOFF2
+#define STM32_DAC_CR_MASK (uint32_t)0x00000FFE
 
-#define STM32_DAC1_CR_TSEL_NONE     (uint32_t)0x00000000
-#define STM32_DAC1_CR_TSEL_TIM2     DAC_CR_TEN1 | DAC_CR_TSEL1_2
-#define STM32_DAC1_CR_TSEL_TIM4     DAC_CR_TEN1 | DAC_CR_TEN0 | DAC_CR_TSEL1_2
-#define STM32_DAC1_CR_TSEL_TIM5     DAC_CR_TEN1 | DAC_CR_TEN0 | DAC_CR_TSEL1_1
-#define STM32_DAC1_CR_TSEL_TIM6     DAC_CR_TEN1
-#define STM32_DAC1_CR_TSEL_TIM7     DAC_CR_TEN1 | DAC_CR_TSEL1_1
-#define STM32_DAC1_CR_TSEL_TIM8     DAC_CR_TEN1 | DAC_CR_TSEL1_0
-#define STM32_DAC1_CR_TSEL_EXT_IT9  DAC_CR_TEN1 | DAC_CR_TEN1 | DAC_CR_TSEL1_2
-#define STM32_DAC1_CR_TSEL_SOFT     DAC_CR_TEN1 | DAC_CR_TEN0 | DAC_CR_TSEL1_1 | DAC_CR_TSEL1_2
+#define STM32_DAC_CR_BOFF_ENABLE    (uint32_t)0x00000000
+#define STM32_DAC_CR_BOFF_DISABLE   DAC_CR_BOFF1
 
-#define STM32_DAC2_CR_TSEL_NONE     (uint32_t)0x00000000
-#define STM32_DAC2_CR_TSEL_TIM2     DAC_CR_TEN2 | DAC_CR_TSEL2_2
-#define STM32_DAC2_CR_TSEL_TIM4     DAC_CR_TEN2 | DAC_CR_TEN0 | DAC_CR_TSEL2_2
-#define STM32_DAC2_CR_TSEL_TIM5     DAC_CR_TEN2 | DAC_CR_TEN0 | DAC_CR_TSEL2_1
-#define STM32_DAC2_CR_TSEL_TIM6     DAC_CR_TEN2
-#define STM32_DAC2_CR_TSEL_TIM7     DAC_CR_TEN2 | DAC_CR_TSEL2_1
-#define STM32_DAC2_CR_TSEL_TIM8     DAC_CR_TEN2 | DAC_CR_TSEL2_0
-#define STM32_DAC2_CR_TSEL_EXT_IT9  DAC_CR_TEN2 | DAC_CR_TSEL2_2
-#define STM32_DAC2_CR_TSEL_SOFT     DAC_CR_TEN2 | DAC_CR_TSEL2_1 | DAC_CR_TSEL2_2
+#define STM32_DAC_CR_TSEL_NONE     (uint32_t)0x00000000
+#define STM32_DAC_CR_TSEL_TIM2     DAC_CR_TEN1 | DAC_CR_TSEL1_2
+#define STM32_DAC_CR_TSEL_TIM4     DAC_CR_TEN1 | DAC_CR_TEN0 | DAC_CR_TSEL1_2
+#define STM32_DAC_CR_TSEL_TIM5     DAC_CR_TEN1 | DAC_CR_TEN0 | DAC_CR_TSEL1_1
+#define STM32_DAC_CR_TSEL_TIM6     DAC_CR_TEN1
+#define STM32_DAC_CR_TSEL_TIM7     DAC_CR_TEN1 | DAC_CR_TSEL1_1
+#define STM32_DAC_CR_TSEL_TIM8     DAC_CR_TEN1 | DAC_CR_TSEL1_0
+#define STM32_DAC_CR_TSEL_EXT_IT9  DAC_CR_TEN1 | DAC_CR_TEN1 | DAC_CR_TSEL1_2
+#define STM32_DAC_CR_TSEL_SOFT     DAC_CR_TEN1 | DAC_CR_TEN0 | DAC_CR_TSEL1_1 | DAC_CR_TSEL1_2
 
-#define STM32_DAC1_CR_WAVE_NONE      (uint32_t)0x00000000
-#define STM32_DAC1_CR_WAVE_NOISE     DAC_CR_WAVE1_0
-#define STM32_DAC1_CR_WAVE_TRIANGLE  DAC_CR_WAVE1_1
+#define STM32_DAC_CR_WAVE_NONE      (uint32_t)0x00000000
+#define STM32_DAC_CR_WAVE_NOISE     DAC_CR_WAVE1_0
+#define STM32_DAC_CR_WAVE_TRIANGLE  DAC_CR_WAVE1_1
 
-#define STM32_DAC2_CR_WAVE_NONE      (uint32_t)0x00000000
-#define STM32_DAC2_CR_WAVE_NOISE     DAC_CR_WAVE2_0
-#define STM32_DAC2_CR_WAVE_TRIANGLE  DAC_CR_WAVE2_1
+#define STM32_DAC_MAMP_1 (uint32_t)0x00000000
+#define STM32_DAC_MAMP_3    DAC_CR_MAMP1_0
+#define STM32_DAC_MAMP_7    DAC_CR_MAMP1_1
+#define STM32_DAC_MAMP_15   DAC_CR_MAMP1_0 | DAC_CR_MAMP1_1
+#define STM32_DAC_MAMP_31   DAC_CR_MAMP1_2
+#define STM32_DAC_MAMP_63   DAC_CR_MAMP1_0 | DAC_CR_MAMP1_2
+#define STM32_DAC_MAMP_127  DAC_CR_MAMP1_1 | DAC_CR_MAMP1_2
+#define STM32_DAC_MAMP_255  DAC_CR_MAMP1_0 | DAC_CR_MAMP1_1 | DAC_CR_MAMP1_2
+#define STM32_DAC_MAMP_511  DAC_CR_MAMP1_3
+#define STM32_DAC_MAMP_1023 DAC_CR_MAMP1_0 | DAC_CR_MAMP1_3
+#define STM32_DAC_MAMP_2047 DAC_CR_MAMP1_1 | DAC_CR_MAMP1_3
+#define STM32_DAC_MAMP_4095 DAC_CR_MAMP1_0 | DAC_CR_MAMP1_1 | DAC_CR_MAMP1_2
 
-#define STM32_DAC1_MAMP_1 (uint32_t)0x00000000
-#define STM32_DAC1_MAMP_3    DAC_CR_MAMP1_0
-#define STM32_DAC1_MAMP_7    DAC_CR_MAMP1_1
-#define STM32_DAC1_MAMP_15   DAC_CR_MAMP1_0 | DAC_CR_MAMP1_1
-#define STM32_DAC1_MAMP_31   DAC_CR_MAMP1_2
-#define STM32_DAC1_MAMP_63   DAC_CR_MAMP1_0 | DAC_CR_MAMP1_2
-#define STM32_DAC1_MAMP_127  DAC_CR_MAMP1_1 | DAC_CR_MAMP1_2
-#define STM32_DAC1_MAMP_255  DAC_CR_MAMP1_0 | DAC_CR_MAMP1_1 | DAC_CR_MAMP1_2
-#define STM32_DAC1_MAMP_511  DAC_CR_MAMP1_3
-#define STM32_DAC1_MAMP_1023 DAC_CR_MAMP1_0 | DAC_CR_MAMP1_3
-#define STM32_DAC1_MAMP_2047 DAC_CR_MAMP1_1 | DAC_CR_MAMP1_3
-#define STM32_DAC1_MAMP_4095 DAC_CR_MAMP1_0 | DAC_CR_MAMP1_1 | DAC_CR_MAMP1_2
-
-#define STM32_DAC2_MAMP_1 (uint32_t)0x00000000
-#define STM32_DAC2_MAMP_3    DAC_CR_MAMP2_0
-#define STM32_DAC2_MAMP_7    DAC_CR_MAMP2_1
-#define STM32_DAC2_MAMP_15   DAC_CR_MAMP2_0 | DAC_CR_MAMP2_1
-#define STM32_DAC2_MAMP_31   DAC_CR_MAMP2_2
-#define STM32_DAC2_MAMP_63   DAC_CR_MAMP2_0 | DAC_CR_MAMP2_2
-#define STM32_DAC2_MAMP_127  DAC_CR_MAMP2_1 | DAC_CR_MAMP2_2
-#define STM32_DAC2_MAMP_255  DAC_CR_MAMP2_0 | DAC_CR_MAMP2_1 | DAC_CR_MAMP2_2
-#define STM32_DAC2_MAMP_511  DAC_CR_MAMP2_3
-#define STM32_DAC2_MAMP_1023 DAC_CR_MAMP2_0 | DAC_CR_MAMP2_3
-#define STM32_DAC2_MAMP_2047 DAC_CR_MAMP2_1 | DAC_CR_MAMP2_3
-#define STM32_DAC2_MAMP_4095 DAC_CR_MAMP2_0 | DAC_CR_MAMP2_1 | DAC_CR_MAMP2_2
-
-#define STM32_DAC1_CR_DMAEN DAC_CR_DMAEN1
-#define STM32_DAC2_CR_DMAEN DAC_CR_DMAEN2
 
 /*===========================================================================*/
 /* Driver pre-compile time settings.                                         */
@@ -249,6 +219,10 @@ typedef struct {
    * @brief Operation complete callback or @p NULL.
    */
   daccallback_t             callback;
+  /**
+   * @brief Error handling callback or @p NULL.
+   */
+  daccallback_t             errcallback;
   /* End of the mandatory fields.*/
   /**
    * @brief   DAC data holding register mode.
@@ -263,7 +237,7 @@ typedef struct {
 /**
  * @brief   Structure representing a DAC driver.
  */
-struct DACDriver{
+struct DACDriver {
   /**
    * @brief Driver state.
    */
@@ -300,6 +274,10 @@ struct DACDriver{
    * @brief Pointer to the TIMx registers block.
    */
   stm32_tim_t               *tim;
+  /**
+   * @brief The Timer IRQ priority.
+   */
+  uint32_t                  irqprio;
   /**
    * @brief Transmit DMA stream.
    */

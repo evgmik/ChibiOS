@@ -321,8 +321,7 @@
 
 #define STM32_HAS_DAC_CHN2          TRUE
 #define STM32_DAC_CHN2_DMA_MSK      (STM32_DMA_STREAM_ID_MSK(1, 6))
-#define STM32_DAC_CHN2_DMA_CHN      0x07000000
-
+#define STM32_DAC_CHN2_DMA_CHN      0x00700000
 
 /* DMA attributes.*/
 #define STM32_ADVANCED_DMA      TRUE

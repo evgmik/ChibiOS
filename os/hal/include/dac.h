@@ -80,7 +80,8 @@ typedef enum {
   DAC_STOP = 1,                     /**< Stopped.                           */
   DAC_READY = 2,                    /**< Ready.                             */
   DAC_ACTIVE = 3,                   /**< Exchanging data.                   */
-  DAC_COMPLETE = 4                  /**< Asynchronous operation complete.   */
+  DAC_COMPLETE = 4,                  /**< Asynchronous operation complete.   */
+  DAC_ERROR = 5 			/**< Error.   */
 } dacstate_t;
 
 #include "dac_lld.h"
@@ -231,6 +232,31 @@ typedef enum {
  */
 #define _dac_isr_half_code(dacp) {                                               \
 /* TODO */                                                                       \
+}
+/** @} */
+
+/**
+ * @brief   Error handler ISR code.
+ * @details This code handles the portable part of the ISR code:
+ *          - Callback invocation.
+ *          - Waiting thread wakeup, if any.
+ *          - Driver state transitions.
+ *          .
+ * @note    This macro is meant to be used in the low level drivers
+ *          implementation only.
+ *
+ * @param[in] dacp      pointer to the @p DACDriver object
+ *
+ * @notapi
+ */
+#define _dac_isr_error_code(dacp) {                                               \
+  if ((dacp)->config->errcallback) {                                             \
+    (dacp)->state = DAC_ERROR;                                           \
+    (dacp)->config->errcallback(dacp); }                                           \
+  else {                                                                      \
+    (dacp)->state = DAC_ERROR;                                              \
+  }      \
+  _dac_wakeup_isr(dacp);                                                  \
 }
 /** @} */
 
