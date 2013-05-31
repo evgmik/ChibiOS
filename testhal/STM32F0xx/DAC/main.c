@@ -62,14 +62,14 @@ static void daccb(DACDriver *dacp) {
  */
 static void dacerrcb(DACDriver *dacp) {
   (void)dacp;
-  palTogglePad(GPIOC, GPIOC_LED4); // Red
+  //palTogglePad(GPIOC, GPIOC_LED4); // Red
 }
 
 /*
  * DAC config, with callbacks.
  */
 static const DACConfig daccfg = {
-  960*DAC_TABLE_SIZE, /* Multiply the buffer size to the desired frequency in Hz */
+  3200*DAC_TABLE_SIZE, /* Multiply the buffer size to the desired frequency in Hz */
   daccb, /* End of transfer callback */
   dacerrcb, /* Error callback */
   DAC_DHRM_12BIT_RIGHT, /* data holding register mode */

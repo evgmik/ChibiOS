@@ -176,8 +176,7 @@ void dac_lld_start(DACDriver *dacp) {
 #if STM32_DAC_USE_CHN1 || STM32_DAC_USE_CHN2
     dacp->clock = STM32_TIMCLK1;
     arr = (dacp->clock / dacp->config->frequency);
-    chDbgAssert((arr <= 0xFFFF) &&
-            (arr * dacp->config->frequency) == dacp->clock,
+    chDbgAssert((arr <= 0xFFFF),
             "dac_lld_start(), #1", "invalid frequency");
 
     /* Timer configuration.*/
@@ -266,7 +265,7 @@ void dac_lld_stop(DACDriver *dacp) {
 #endif
 #if STM32_DAC_USE_CHN2
     if (&DACD2 == dacp) {
-      dacp->dac->CR &= ~STM32_DAC_CR_EN << 16); /* DAC disable.*/
+      dacp->dac->CR &= ~STM32_DAC_CR_EN << 16; /* DAC disable.*/
     }
 #endif
     dacp->tim->CR1 &= ~TIM_CR1_CEN; /* Disable associated timer */

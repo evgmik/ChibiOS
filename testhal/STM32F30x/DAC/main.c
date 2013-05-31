@@ -52,7 +52,7 @@ const uint16_t dac_buffer[DAC_TABLE_SIZE] = {2047, 2082, 2118, 2154, 2189, 2225,
 /*
  * Turn on the green LED once DMA ends the transmission.
  */
-static void daccb(DACDriver *dacp) {
+static void daccb1(DACDriver *dacp) {
   (void)dacp;
   palTogglePad(GPIOE, GPIOE_LED6_GREEN); // Green
 }
@@ -60,9 +60,25 @@ static void daccb(DACDriver *dacp) {
 /*
  * Turn on the orange LED if there are DMA errors.
  */
-static void dacerrcb(DACDriver *dacp) {
+static void dacerrcb1(DACDriver *dacp) {
   (void)dacp;
   palTogglePad(GPIOE, GPIOE_LED8_ORANGE); // Orange
+}
+
+/*
+ * Turn on the blue LED once DMA ends the transmission.
+ */
+static void daccb2(DACDriver *dacp) {
+  (void)dacp;
+  palTogglePad(GPIOE, GPIOE_LED4_BLUE); // Blue
+}
+
+/*
+ * Turn on the orange LED if there are DMA errors.
+ */
+static void dacerrcb2(DACDriver *dacp) {
+  (void)dacp;
+  palTogglePad(GPIOE, GPIOE_LED5_ORANGE); // Orange
 }
 
 /*
@@ -70,16 +86,16 @@ static void dacerrcb(DACDriver *dacp) {
  */
 static const DACConfig daccfg1 = {
   960*DAC_TABLE_SIZE, /* Multiply the buffer size to the desired frequency in Hz */
-  daccb, /* End of transfer callback */
-  dacerrcb, /* Error callback */
+  daccb1, /* End of transfer callback */
+  dacerrcb1, /* Error callback */
   DAC_DHRM_12BIT_RIGHT, /* data holding register mode */
   0 /* CR flags */
 };
 
 static const DACConfig daccfg2 = {
   2500*DAC_TABLE_SIZE, /* Multiply the buffer size to the desired frequency in Hz */
-  daccb, /* End of transfer callback */
-  dacerrcb, /* Error callback */
+  daccb2, /* End of transfer callback */
+  dacerrcb2, /* Error callback */
   DAC_DHRM_12BIT_RIGHT, /* data holding register mode */
   0 /* CR flags */
 };

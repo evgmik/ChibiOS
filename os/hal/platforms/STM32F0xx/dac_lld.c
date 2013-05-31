@@ -129,11 +129,10 @@ void dac_lld_start(DACDriver *dacp) {
     /* Timer setup */
     rccEnableTIM6(FALSE);
     rccResetTIM6();
-	  
+
     dacp->clock = STM32_TIMCLK1;
     arr = (dacp->clock / dacp->config->frequency);
-    chDbgAssert((arr <= 0xFFFF) &&
-      (arr * dacp->config->frequency) == dacp->clock,
+    chDbgAssert((arr <= 0xFFFF),
       "dac_lld_start(), #1", "invalid frequency");
 
     /* Timer configuration.*/

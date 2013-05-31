@@ -132,7 +132,6 @@
 #define STM32_DAC_DMA_ERROR_HOOK(dacp)      chSysHalt()
 #endif
 
-
 /**
  * @brief   DMA stream used for DAC CHN1 TX operations.
  * @note    This option is only available on platforms with enhanced DMA.
