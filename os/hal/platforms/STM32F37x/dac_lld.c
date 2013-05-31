@@ -121,7 +121,7 @@ void dac_lld_init(void) {
 
 #if STM32_DAC_USE_CHN1
   dacObjectInit(&DACD1);
-  DACD1.dac     = DAC;
+  DACD1.dac     = DAC1;
   DACD1.tim     = STM32_TIM6;
   DACD1.irqprio = STM32_DAC_CHN1_IRQ_PRIORITY;
   DACD1.dma     = STM32_DMA_STREAM(STM32_DAC_CHN1_DMA_STREAM);
@@ -135,7 +135,7 @@ void dac_lld_init(void) {
 
 #if STM32_DAC_USE_CHN2
   dacObjectInit(&DACD2);
-  DACD2.dac     = DAC;
+  DACD2.dac     = DAC1;
   DACD2.tim     = STM32_TIM7;
   DACD2.irqprio = STM32_DAC_CHN2_IRQ_PRIORITY;
   DACD2.dma     = STM32_DMA_STREAM(STM32_DAC_CHN2_DMA_STREAM);
@@ -150,7 +150,7 @@ void dac_lld_init(void) {
 
 #if STM32_DAC_USE_CHN3
   dacObjectInit(&DACD3);
-  DACD3.dac     = DAC;
+  DACD3.dac     = DAC2;
   DACD3.tim     = STM32_TIM18;
   DACD3.irqprio = STM32_DAC_CHN3_IRQ_PRIORITY;
   DACD3.dma     = STM32_DMA_STREAM(STM32_DAC_CHN3_DMA_STREAM);

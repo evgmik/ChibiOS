@@ -184,7 +184,7 @@
 /*===========================================================================*/
 
 #if STM32_DAC_USE_CHN1 && !STM32_HAS_DAC_CHN1
-#error "DAC1 not present in the selected device"
+#error "DAC CHN1 not present in the selected device"
 #endif
 
 #if STM32_DAC_USE_CHN2 && !STM32_HAS_DAC_CHN2
@@ -192,7 +192,7 @@
 #endif
 
 #if STM32_DAC_USE_CHN3 && !STM32_HAS_DAC_CHN3
-#error "DAC CHN2 not present in the selected device"
+#error "DAC CHN3 not present in the selected device"
 #endif
 
 #if !STM32_DAC_USE_CHN1  && !STM32_DAC_USE_CHN2 && !STM32_DAC_USE_CHN3

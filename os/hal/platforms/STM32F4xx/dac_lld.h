@@ -121,7 +121,7 @@
 /**
  * @brief   DAC CHN2 DMA priority (0..3|lowest..highest).
  */
-#if !defined(STM32_DAC_DAC2_DMA_PRIORITY) || defined(__DOXYGEN__)
+#if !defined(STM32_DAC_CHN2_DMA_PRIORITY) || defined(__DOXYGEN__)
 #define STM32_DAC_CHN2_DMA_PRIORITY         2
 #endif
 
@@ -154,7 +154,7 @@
 /*===========================================================================*/
 
 #if STM32_DAC_USE_CHN1 && !STM32_HAS_DAC_CHN1
-#error "DAC1 not present in the selected device"
+#error "DAC CHN1 not present in the selected device"
 #endif
 
 #if STM32_DAC_USE_CHN2 && !STM32_HAS_DAC_CHN2
