@@ -161,7 +161,11 @@
 #error "DAC CHN2 not present in the selected device"
 #endif
 
-#if !STM32_DAC_USE_CHN1 && !STM32_DAC_USE_CHN2
+#if STM32_DAC_USE_CHN3 && !STM32_HAS_DAC_CHN3
+#error "DAC CHN3 not present in the selected device"
+#endif
+
+#if !STM32_DAC_USE_CHN1  && !STM32_DAC_USE_CHN2 && !STM32_DAC_USE_CHN3
 #error "DAC driver activated but no DAC peripheral assigned"
 #endif
 
@@ -173,6 +177,11 @@
 #if STM32_DAC_USE_CHN2 &&                                                   \
     !STM32_DMA_IS_VALID_ID(STM32_DAC_CHN2_DMA_STREAM, STM32_DAC_CHN2_DMA_MSK)
 #error "invalid DMA stream associated to DAC CHN2"
+#endif
+
+#if STM32_DAC_USE_CHN3 &&                                                   \
+    !STM32_DMA_IS_VALID_ID(STM32_DAC_CHN3_DMA_STREAM, STM32_DAC_CHN3_DMA_MSK)
+#error "invalid DMA stream associated to DAC CHN3"
 #endif
 
 #if !defined(STM32_DMA_REQUIRED)

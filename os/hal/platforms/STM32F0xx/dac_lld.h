@@ -109,7 +109,6 @@
 #define STM32_DAC_DMA_ERROR_HOOK(dacp)      chSysHalt()
 #endif
 
-
 /**
  * @brief   DMA stream used for DAC CHN1 TX operations.
  * @note    This option is only available on platforms with enhanced DMA.
@@ -130,13 +129,27 @@
 #error "DAC CHN2 not present in the selected device"
 #endif
 
-#if !STM32_DAC_USE_CHN1 && !STM32_DAC_USE_CHN2
+#if STM32_DAC_USE_CHN3 && !STM32_HAS_DAC_CHN3
+#error "DAC CHN3 not present in the selected device"
+#endif
+
+#if !STM32_DAC_USE_CHN1  && !STM32_DAC_USE_CHN2 && !STM32_DAC_USE_CHN3
 #error "DAC driver activated but no DAC peripheral assigned"
 #endif
 
 #if STM32_DAC_USE_CHN1 &&                                                   \
     !STM32_DMA_IS_VALID_ID(STM32_DAC_CHN1_DMA_STREAM, STM32_DAC_CHN1_DMA_MSK)
 #error "invalid DMA stream associated to DAC CHN1"
+#endif
+
+#if STM32_DAC_USE_CHN2 &&                                                   \
+    !STM32_DMA_IS_VALID_ID(STM32_DAC_CHN2_DMA_STREAM, STM32_DAC_CHN2_DMA_MSK)
+#error "invalid DMA stream associated to DAC CHN2"
+#endif
+
+#if STM32_DAC_USE_CHN3 &&                                                   \
+    !STM32_DMA_IS_VALID_ID(STM32_DAC_CHN3_DMA_STREAM, STM32_DAC_CHN3_DMA_MSK)
+#error "invalid DMA stream associated to DAC CHN3"
 #endif
 
 #if !defined(STM32_DMA_REQUIRED)
@@ -163,10 +176,7 @@ typedef void (*daccallback_t)(DACDriver *dacp);
 typedef enum { 
   DAC_DHRM_12BIT_RIGHT = 0,
   DAC_DHRM_12BIT_LEFT = 1,
-  DAC_DHRM_8BIT_RIGHT = 2,
-  DAC_DHRM_12BIT_RIGHT_DUAL = 3,
-  DAC_DHRM_12BIT_LEFT_DUAL = 4,
-  DAC_DHRM_8BIT_RIGHT_DUAL = 5
+  DAC_DHRM_8BIT_RIGHT = 2
 } dacdhrmode_t;
 
 /**

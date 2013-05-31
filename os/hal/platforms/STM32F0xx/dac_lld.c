@@ -179,21 +179,6 @@ void dac_lld_start(DACDriver *dacp) {
       dacp->dmamode = (dacp->dmamode & ~STM32_DMA_CR_SIZE_MASK) |
             STM32_DMA_CR_PSIZE_BYTE | STM32_DMA_CR_MSIZE_BYTE;
         break;
-      case DAC_DHRM_12BIT_RIGHT_DUAL:
-      dmaStreamSetPeripheral(dacp->dma, &dacp->dac->DHR12RD);
-      dacp->dmamode = (dacp->dmamode & ~STM32_DMA_CR_SIZE_MASK) |
-            STM32_DMA_CR_PSIZE_HWORD | STM32_DMA_CR_MSIZE_HWORD;
-        break;
-      case DAC_DHRM_12BIT_LEFT_DUAL:
-      dmaStreamSetPeripheral(dacp->dma, &dacp->dac->DHR12LD);
-      dacp->dmamode = (dacp->dmamode & ~STM32_DMA_CR_SIZE_MASK) |
-            STM32_DMA_CR_PSIZE_HWORD | STM32_DMA_CR_MSIZE_HWORD;
-        break;
-      case DAC_DHRM_8BIT_RIGHT_DUAL:
-      dmaStreamSetPeripheral(dacp->dma, &dacp->dac->DHR8RD);
-      dacp->dmamode = (dacp->dmamode & ~STM32_DMA_CR_SIZE_MASK) |
-           STM32_DMA_CR_PSIZE_BYTE | STM32_DMA_CR_MSIZE_BYTE;
-        break;
 }
 
 dacp->dac->CR |= STM32_DAC_CR_TSEL_TIM6; /* Enable trigger */
@@ -246,13 +231,11 @@ void dac_lld_send_circular(DACDriver *dacp, size_t n, const void *txbuf){
                    STM32_DMA_CR_CIRC);
 }
 
-void dac_lld_send_doublebuffer(DACDriver *dacp, size_t n, const void *txbuf0,  \
-                               const void *txbuf1) {
-  dmaStreamSetMemory0(dacp->dma, txbuf0);
-  dmaStreamSetMemory1(dacp->dma, txbuf1);
-  dmaStreamSetTransactionSize(dacp->dma, n);
-  dmaStreamSetMode(dacp->dma, dacp->dmamode | STM32_DMA_CR_EN |                \
-                   STM32_DMA_CR_DBM);
+void dac_lld_send_doublebuffer(DACDriver *dacp, size_t n, const void *txbuf0,  const void *txbuf1) {
+  (void) dacp;
+  (void) n;
+  (void) txbuf0;
+  (void) txbuf1;
 }
 
 #endif /* HAL_USE_DAC */

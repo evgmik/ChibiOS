@@ -42,7 +42,7 @@
 #define DAC_CHN2_DMA_CHANNEL                                                 \
   STM32_DMA_GETCHANNEL(STM32_DAC_CHN2_DMA_STREAM,                            \
                        STM32_DAC_CHN2_DMA_CHN)
-		       
+           
 #define DAC_CHN3_DMA_CHANNEL                                                 \
   STM32_DMA_GETCHANNEL(STM32_DAC_CHN3_DMA_STREAM,                            \
                        STM32_DAC_CHN3_DMA_CHN)
@@ -85,8 +85,8 @@ static void dac_lld_serve_tx_interrupt(DACDriver *dacp, uint32_t flags) {
 #if defined(STM32_DAC_DMA_ERROR_HOOK)
   (void)dacp;
   if ((flags & (STM32_DMA_ISR_TEIF | STM32_DMA_ISR_DMEIF)) != 0) {
-		/* DMA errors handling.*/
-		_dac_isr_error_code(dacp);
+    /* DMA errors handling.*/
+    _dac_isr_error_code(dacp);
   }
   else {
     if ((flags & STM32_DMA_ISR_HTIF) != 0) {
@@ -146,7 +146,6 @@ void dac_lld_init(void) {
                   STM32_DMA_CR_TEIE |                                         \
                   STM32_DMA_CR_MINC | STM32_DMA_CR_TCIE;
 #endif
-}
 
 #if STM32_DAC_USE_CHN3
   dacObjectInit(&DACD3);
@@ -172,41 +171,43 @@ void dac_lld_init(void) {
  */
 void dac_lld_start(DACDriver *dacp) {
   uint32_t arr, regshift, trgo, dataoffset;
-	bool_t b;
+  bool_t b;
   /* If in stopped state then enables the DAC and DMA clocks.*/
   if (dacp->state == DAC_STOP) {
-    rccEnableDAC(FALSE);
 #if STM32_DAC_USE_CHN1
     if (&DACD1 == dacp) {
-			/* DAC1 CR data is at bits 0:15 */
+      rccEnableDAC1(FALSE);
+      /* DAC1 CR data is at bits 0:15 */
       regshift = 0;
-			dataoffset = 0;
+      dataoffset = 0;
       /* Timer setup */
       rccEnableTIM6(FALSE);
       rccResetTIM6();
-			trgo = STM32_DAC_CR_TSEL_TIM6;
+      trgo = STM32_DAC_CR_TSEL_TIM6;
     }
 #endif
 #if STM32_DAC_USE_CHN2
     if (&DACD2 == dacp) {
-			/* DAC2 CR data is at bits 16:31 */
+      rccEnableDAC1(FALSE);
+      /* DAC2 CR data is at bits 16:31 */
       regshift = 16;
-			dataoffset = &dacp->dac->DHR12R2 - &dacp->dac->DHR12R1;
+      dataoffset = &dacp->dac->DHR12R2 - &dacp->dac->DHR12R1;
       /* Timer setup */
       rccEnableTIM7(FALSE);
       rccResetTIM7();
-			trgo = STM32_DAC_CR_TSEL_TIM7;
+      trgo = STM32_DAC_CR_TSEL_TIM7;
     }
 #endif
 #if STM32_DAC_USE_CHN3
     if (&DACD3 == dacp) {
-			/* DAC3 CR data is at bits 0:15 */
+      rccEnableDAC2(FALSE);
+      /* DAC3 CR data is at bits 0:15 */
       regshift = 0;
-			dataoffset = 0;
+      dataoffset = 0;
       /* Timer setup */
       rccEnableTIM18(FALSE);
       rccResetTIM18();
-			trgo = STM32_DAC_CR_TSEL_TIM18;
+      trgo = STM32_DAC_CR_TSEL_TIM18;
     }
 #endif
 #if STM32_DAC_USE_CHN1 || STM32_DAC_USE_CHN2 || STM32_DAC_USE_CHN3
@@ -272,9 +273,9 @@ void dac_lld_start(DACDriver *dacp) {
       dacp->dmamode = (dacp->dmamode & ~STM32_DMA_CR_SIZE_MASK) |
            STM32_DMA_CR_PSIZE_BYTE | STM32_DMA_CR_MSIZE_BYTE;
         break;
-	}
-	
-	dacp->dac->CR |= trgo << regshift; /* Enable trigger */
+  }
+  
+  dacp->dac->CR |= trgo << regshift; /* Enable trigger */
 #endif
   }
 }
@@ -296,18 +297,18 @@ void dac_lld_stop(DACDriver *dacp) {
   /* TODO: how to handle rccDisableDAC */
 #if STM32_DAC_USE_CHN1
     if (&DACD1 == dacp)
-      DAC->CR = (DAC->CR & 0xFFFFFFFE); 
-      /* rccDisableDAC(FALSE); */
+      DAC1->CR = (DAC1->CR & 0xFFFFFFFE); 
+      /* rccDisableDAC1(FALSE); */
 #endif
 #if STM32_DAC_USE_CHN2
     if (&DACD2 == dacp)
-      DAC->CR = (DAC->CR & 0xFFFEFFFF);
-      /* rccDisableDAC(FALSE); */
+      DAC1->CR = (DAC1->CR & 0xFFFEFFFF);
+      /* rccDisableDAC1(FALSE); */
 #endif
 #if STM32_DAC_USE_CHN3
     if (&DACD3 == dacp)
-      DAC->CR = (DAC->CR & 0xFFFEFFFF);
-      /* rccDisableDAC(FALSE); */
+      DAC2->CR = (DAC2->CR & 0xFFFEFFFF);
+      /* rccDisableDAC2(FALSE); */
 #endif
   }
 }
@@ -336,13 +337,11 @@ void dac_lld_send_circular(DACDriver *dacp, size_t n, const void *txbuf){
                    STM32_DMA_CR_CIRC);
 }
 
-void dac_lld_send_doublebuffer(DACDriver *dacp, size_t n, const void *txbuf0,  \
-                               const void *txbuf1) {
-  dmaStreamSetMemory0(dacp->dma, txbuf0);
-  dmaStreamSetMemory1(dacp->dma, txbuf1);
-  dmaStreamSetTransactionSize(dacp->dma, n);
-  dmaStreamSetMode(dacp->dma, dacp->dmamode | STM32_DMA_CR_EN |                \
-                   STM32_DMA_CR_DBM);
+void dac_lld_send_doublebuffer(DACDriver *dacp, size_t n, const void *txbuf0, const void *txbuf1) {
+  (void) dacp;
+  (void) n;
+  (void) txbuf0;
+  (void) txbuf1;
 }
 
 #endif /* HAL_USE_DAC */

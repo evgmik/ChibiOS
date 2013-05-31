@@ -191,7 +191,7 @@
 /** @} */
 
 /**
- * @name    DAC peripheral specific RCC operations
+ * @name    DAC1 peripheral specific RCC operations
  * @{
  */
 /**
@@ -201,7 +201,7 @@
  *
  * @api
  */
-#define rccEnableDAC(lp) rccEnableAPB1(RCC_APB1ENR_DACEN, lp)
+#define rccEnableDAC1(lp) rccEnableAPB1(RCC_APB1ENR_DAC1EN, lp)
 
 /**
  * @brief   Disables the DAC peripheral clock.
@@ -210,14 +210,44 @@
  *
  * @api
  */
-#define rccDisableDAC(lp) rccDisableAPB1(RCC_APB1ENR_DACEN, lp)
+#define rccDisableDAC1(lp) rccDisableAPB1(RCC_APB1ENR_DAC1EN, lp)
 
 /**
  * @brief   Resets the DAC peripheral.
  *
  * @api
  */
-#define rccResetDAC() rccResetAPB1(RCC_APB1RSTR_DACRST)
+#define rccResetDAC1() rccResetAPB1(RCC_APB1RSTR_DAC1RST)
+/** @} */
+
+/**
+ * @name    DAC2 peripheral specific RCC operations
+ * @{
+ */
+/**
+ * @brief   Enables the DAC peripheral clock.
+ *
+ * @param[in] lp        low power enable flag
+ *
+ * @api
+ */
+#define rccEnableDAC2(lp) rccEnableAPB1(RCC_APB1ENR_DAC2EN, lp)
+
+/**
+ * @brief   Disables the DAC peripheral clock.
+ *
+ * @param[in] lp        low power enable flag
+ *
+ * @api
+ */
+#define rccDisableDAC2(lp) rccDisableAPB1(RCC_APB1ENR_DAC2EN, lp)
+
+/**
+ * @brief   Resets the DAC peripheral.
+ *
+ * @api
+ */
+#define rccResetDAC2() rccResetAPB1(RCC_APB1RSTR_DAC2RST)
 /** @} */
 
 /**

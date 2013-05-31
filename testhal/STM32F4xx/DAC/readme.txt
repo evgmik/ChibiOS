@@ -12,11 +12,13 @@ The application demonstrates the use of the STM32F4xx DAC driver.
 
 ** Board Setup **
 
-TODO:
-- Connect PA4 and ?? together for DAC-ADC loop-back.
+None.
 
 ** Build Procedure **
- TODO:
+
+The demo has been tested using the free Codesourcery GCC-based toolchain
+and YAGARTO.
+Just modify the TRGT line in the makefile in order to use different GCC ports.
 
 ** Notes **
 

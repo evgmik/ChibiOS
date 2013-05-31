@@ -1,14 +1,14 @@
 *****************************************************************************
-** ChibiOS/RT HAL - DAC driver demo for STM32F37x.                         **
+** ChibiOS/RT HAL - DAC driver demo for STM32F0xx.                         **
 *****************************************************************************
 
 ** TARGET **
 
-The demo runs on an STMicroelectronics STM32373C-EVAL board.
+The demo runs on an ST STM32F0-Discovery board.
 
 ** The Demo **
 
-The application demonstrates the use of the STM32F37x DAC driver.
+The application demonstrates the use of the STM32F0xx DAC driver.
 
 ** Board Setup **
 

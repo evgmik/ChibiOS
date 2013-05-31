@@ -296,13 +296,11 @@ void dac_lld_send_circular(DACDriver *dacp, size_t n, const void *txbuf){
                    STM32_DMA_CR_CIRC);
 }
 
-void dac_lld_send_doublebuffer(DACDriver *dacp, size_t n, const void *txbuf0,  \
-                               const void *txbuf1) {
-  dmaStreamSetMemory0(dacp->dma, txbuf0);
-  dmaStreamSetMemory1(dacp->dma, txbuf1);
-  dmaStreamSetTransactionSize(dacp->dma, n);
-  dmaStreamSetMode(dacp->dma, dacp->dmamode | STM32_DMA_CR_EN |                \
-                   STM32_DMA_CR_DBM);
+void dac_lld_send_doublebuffer(DACDriver *dacp, size_t n, const void *txbuf0, const void *txbuf1) {
+  (void) dacp;
+  (void) n;
+  (void) txbuf0;
+  (void) txbuf1;
 }
 
 #endif /* HAL_USE_DAC */
