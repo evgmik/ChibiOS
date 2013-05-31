@@ -244,34 +244,34 @@ void dac_lld_start(DACDriver *dacp) {
     switch (dacp->config->dhrm) {
       /* Sets the DAC data register */
       case DAC_DHRM_12BIT_RIGHT:
-      dmaStreamSetPeripheral(dacp->dma, &dacp->dac->DHR12R1 + dataoffset);
-      dacp->dmamode = (dacp->dmamode & ~STM32_DMA_CR_SIZE_MASK) |
-            STM32_DMA_CR_PSIZE_HWORD | STM32_DMA_CR_MSIZE_HWORD;
+        dmaStreamSetPeripheral(dacp->dma, &dacp->dac->DHR12R1 + dataoffset);
+        dacp->dmamode = (dacp->dmamode & ~STM32_DMA_CR_SIZE_MASK) |
+              STM32_DMA_CR_PSIZE_HWORD | STM32_DMA_CR_MSIZE_HWORD;
         break;
       case DAC_DHRM_12BIT_LEFT:
-      dmaStreamSetPeripheral(dacp->dma, &dacp->dac->DHR12L1 + dataoffset);
-      dacp->dmamode = (dacp->dmamode & ~STM32_DMA_CR_SIZE_MASK) |
-            STM32_DMA_CR_PSIZE_HWORD | STM32_DMA_CR_MSIZE_HWORD;
+        dmaStreamSetPeripheral(dacp->dma, &dacp->dac->DHR12L1 + dataoffset);
+        dacp->dmamode = (dacp->dmamode & ~STM32_DMA_CR_SIZE_MASK) |
+              STM32_DMA_CR_PSIZE_HWORD | STM32_DMA_CR_MSIZE_HWORD;
         break;
       case DAC_DHRM_8BIT_RIGHT:
-      dmaStreamSetPeripheral(dacp->dma, &dacp->dac->DHR8R1 + dataoffset);
-      dacp->dmamode = (dacp->dmamode & ~STM32_DMA_CR_SIZE_MASK) |
-            STM32_DMA_CR_PSIZE_BYTE | STM32_DMA_CR_MSIZE_BYTE;
+        dmaStreamSetPeripheral(dacp->dma, &dacp->dac->DHR8R1 + dataoffset);
+        dacp->dmamode = (dacp->dmamode & ~STM32_DMA_CR_SIZE_MASK) |
+              STM32_DMA_CR_PSIZE_BYTE | STM32_DMA_CR_MSIZE_BYTE;
         break;
       case DAC_DHRM_12BIT_RIGHT_DUAL:
-      dmaStreamSetPeripheral(dacp->dma, &dacp->dac->DHR12RD);
-      dacp->dmamode = (dacp->dmamode & ~STM32_DMA_CR_SIZE_MASK) |
-            STM32_DMA_CR_PSIZE_HWORD | STM32_DMA_CR_MSIZE_HWORD;
+        dmaStreamSetPeripheral(dacp->dma, &dacp->dac->DHR12RD);
+        dacp->dmamode = (dacp->dmamode & ~STM32_DMA_CR_SIZE_MASK) |
+              STM32_DMA_CR_PSIZE_HWORD | STM32_DMA_CR_MSIZE_HWORD;
         break;
       case DAC_DHRM_12BIT_LEFT_DUAL:
-      dmaStreamSetPeripheral(dacp->dma, &dacp->dac->DHR12LD);
-      dacp->dmamode = (dacp->dmamode & ~STM32_DMA_CR_SIZE_MASK) |
-            STM32_DMA_CR_PSIZE_HWORD | STM32_DMA_CR_MSIZE_HWORD;
+        dmaStreamSetPeripheral(dacp->dma, &dacp->dac->DHR12LD);
+        dacp->dmamode = (dacp->dmamode & ~STM32_DMA_CR_SIZE_MASK) |
+              STM32_DMA_CR_PSIZE_HWORD | STM32_DMA_CR_MSIZE_HWORD;
         break;
       case DAC_DHRM_8BIT_RIGHT_DUAL:
-      dmaStreamSetPeripheral(dacp->dma, &dacp->dac->DHR8RD);
-      dacp->dmamode = (dacp->dmamode & ~STM32_DMA_CR_SIZE_MASK) |
-           STM32_DMA_CR_PSIZE_BYTE | STM32_DMA_CR_MSIZE_BYTE;
+        dmaStreamSetPeripheral(dacp->dma, &dacp->dac->DHR8RD);
+        dacp->dmamode = (dacp->dmamode & ~STM32_DMA_CR_SIZE_MASK) |
+             STM32_DMA_CR_PSIZE_BYTE | STM32_DMA_CR_MSIZE_BYTE;
         break;
   }
   

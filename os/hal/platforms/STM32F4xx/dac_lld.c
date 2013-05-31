@@ -153,24 +153,24 @@ void dac_lld_start(DACDriver *dacp) {
     rccEnableDAC(FALSE);
 #if STM32_DAC_USE_CHN1
     if (&DACD1 == dacp) {
-			/* DAC1 CR data is at bits 0:15 */
+      /* DAC1 CR data is at bits 0:15 */
       regshift = 0;
-			dataoffset = 0;
+      dataoffset = 0;
       /* Timer setup */
       rccEnableTIM6(FALSE);
       rccResetTIM6();
-			trgo = STM32_DAC_CR_TSEL_TIM6;
+      trgo = STM32_DAC_CR_TSEL_TIM6;
     }
 #endif
 #if STM32_DAC_USE_CHN2
     if (&DACD2 == dacp) {
-			/* DAC2 CR data is at bits 16:31 */
+      /* DAC2 CR data is at bits 16:31 */
       regshift = 16;
-			dataoffset = &dacp->dac->DHR12R2 - &dacp->dac->DHR12R1;
+      dataoffset = &dacp->dac->DHR12R2 - &dacp->dac->DHR12R1;
       /* Timer setup */
       rccEnableTIM7(FALSE);
       rccResetTIM7();
-			trgo = STM32_DAC_CR_TSEL_TIM7;
+      trgo = STM32_DAC_CR_TSEL_TIM7;
     }
 #endif
 #if STM32_DAC_USE_CHN1 || STM32_DAC_USE_CHN2

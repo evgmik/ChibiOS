@@ -126,11 +126,9 @@ void dac_lld_start(DACDriver *dacp) {
   if (dacp->state == DAC_STOP) {
     rccEnableDAC(FALSE);
 
-    if (&DACD1 == dacp) {
-      /* Timer setup */
-      rccEnableTIM6(FALSE);
-      rccResetTIM6();
-    }
+    /* Timer setup */
+    rccEnableTIM6(FALSE);
+    rccResetTIM6();
 	  
     dacp->clock = STM32_TIMCLK1;
     arr = (dacp->clock / dacp->config->frequency);
@@ -165,19 +163,19 @@ void dac_lld_start(DACDriver *dacp) {
     switch (dacp->config->dhrm) {
       /* Sets the DAC data register */
       case DAC_DHRM_12BIT_RIGHT:
-      dmaStreamSetPeripheral(dacp->dma, &dacp->dac->DHR12R1);
-      dacp->dmamode = (dacp->dmamode & ~STM32_DMA_CR_SIZE_MASK) |
-            STM32_DMA_CR_PSIZE_HWORD | STM32_DMA_CR_MSIZE_HWORD;
+        dmaStreamSetPeripheral(dacp->dma, &dacp->dac->DHR12R1);
+        dacp->dmamode = (dacp->dmamode & ~STM32_DMA_CR_SIZE_MASK) |
+              STM32_DMA_CR_PSIZE_HWORD | STM32_DMA_CR_MSIZE_HWORD;
         break;
       case DAC_DHRM_12BIT_LEFT:
-      dmaStreamSetPeripheral(dacp->dma, &dacp->dac->DHR12L1);
-      dacp->dmamode = (dacp->dmamode & ~STM32_DMA_CR_SIZE_MASK) |
-            STM32_DMA_CR_PSIZE_HWORD | STM32_DMA_CR_MSIZE_HWORD;
+        dmaStreamSetPeripheral(dacp->dma, &dacp->dac->DHR12L1);
+        dacp->dmamode = (dacp->dmamode & ~STM32_DMA_CR_SIZE_MASK) |
+              STM32_DMA_CR_PSIZE_HWORD | STM32_DMA_CR_MSIZE_HWORD;
         break;
       case DAC_DHRM_8BIT_RIGHT:
-      dmaStreamSetPeripheral(dacp->dma, &dacp->dac->DHR8R1);
-      dacp->dmamode = (dacp->dmamode & ~STM32_DMA_CR_SIZE_MASK) |
-            STM32_DMA_CR_PSIZE_BYTE | STM32_DMA_CR_MSIZE_BYTE;
+        dmaStreamSetPeripheral(dacp->dma, &dacp->dac->DHR8R1);
+        dacp->dmamode = (dacp->dmamode & ~STM32_DMA_CR_SIZE_MASK) |
+              STM32_DMA_CR_PSIZE_BYTE | STM32_DMA_CR_MSIZE_BYTE;
         break;
 }
 
