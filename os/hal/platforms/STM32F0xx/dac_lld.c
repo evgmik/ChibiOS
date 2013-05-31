@@ -200,11 +200,10 @@ void dac_lld_stop(DACDriver *dacp) {
     /* DMA disable.*/
     dmaStreamRelease(dacp->dma);
 
-    if (&DACD1 == dacp) {
-      dacp->dac->CR = (dacp->dac->CR & ~STM32_DAC_CR_EN); /* DAC disable.*/
-      rccDisableDAC(FALSE); /* DAC Clock disable.*/
-    }
-    dacp->tim->CR1 &= ~TIM_CR1_CEN; /* Disable timer */
+    dacp->dac->CR &= ~STM32_DAC_CR_EN; /* DAC disable.*/
+    rccDisableDAC(FALSE); /* DAC Clock disable.*/
+
+    dacp->tim->CR1 &= ~TIM_CR1_CEN; /* Disable associated timer */
     dacp->state = DAC_STOP;
   }
 }

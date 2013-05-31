@@ -297,26 +297,27 @@ void dac_lld_stop(DACDriver *dacp) {
 
 #if STM32_DAC_USE_CHN1
     if (&DACD1 == dacp) {
-      dacp->dac->CR = (dacp->dac->CR & ~STM32_DAC_CR_EN); /* DAC1 disable.*/
+      dacp->dac->CR &= ~STM32_DAC_CR_EN; /* DAC1 disable.*/
     }
 #endif
 #if STM32_DAC_USE_CHN2
     if (&DACD2 == dacp) {
-      dacp->dac->CR = (dacp->dac->CR & ~STM32_DAC_CR_EN \
-          << 16); /* DAC disable.*/
+      dacp->dac->CR &= ~STM32_DAC_CR_EN << 16); /* DAC1 disable.*/
     }
 #endif
 #if STM32_DAC_USE_CHN3
     if (&DACD3 == dacp) {
-      dacp->dac->CR = (dacp->dac->CR & ~STM32_DAC_CR_EN); /* DAC2 disable.*/
+      dacp->dac->CR &= ~STM32_DAC_CR_EN; /* DAC2 disable.*/
       rccDisableDAC2(FALSE); /* DAC Clock disable.*/
     }
 #endif
-    dacp->tim->CR1 &= ~TIM_CR1_CEN; /* Disable timer */
+    dacp->tim->CR1 &= ~TIM_CR1_CEN; /* Disable associated timer */
     dacp->state = DAC_STOP;
-  }
-  if (DAC1->CR & STM32_DAC_CR_EN && DAC1->CR & STM32_DAC_CR_EN << 16 ) {
-    rccDisableDAC1(FALSE); /* DAC Clock disable only if all channels are off.*/
+
+    if (!(DAC1->CR & (STM32_DAC_CR_EN | STM32_DAC_CR_EN << 16))) {
+      /* DAC Clock disable only if all channels are off.*/
+      rccDisableDAC1(FALSE);
+    }
   }
 }
 
