@@ -154,24 +154,24 @@ void dac_lld_start(DACDriver *dacp) {
     rccEnableDAC(FALSE);
 #if STM32_DAC_USE_CHN1
     if (&DACD1 == dacp) {
-			/* DAC1 CR data is at bits 0:15 */
+      /* DAC1 CR data is at bits 0:15 */
       regshift = 0;
-			dataoffset = 0;
+      dataoffset = 0;
       /* Timer setup */
       rccEnableTIM6(FALSE);
       rccResetTIM6();
-			trgo = STM32_DAC_CR_TSEL_TIM6;
+      trgo = STM32_DAC_CR_TSEL_TIM6;
     }
 #endif
 #if STM32_DAC_USE_CHN2
     if (&DACD2 == dacp) {
-			/* DAC2 CR data is at bits 16:31 */
+      /* DAC2 CR data is at bits 16:31 */
       regshift = 16;
-			dataoffset = &dacp->dac->DHR12R2 - &dacp->dac->DHR12R1;
+      dataoffset = &dacp->dac->DHR12R2 - &dacp->dac->DHR12R1;
       /* Timer setup */
       rccEnableTIM7(FALSE);
       rccResetTIM7();
-			trgo = STM32_DAC_CR_TSEL_TIM7;
+      trgo = STM32_DAC_CR_TSEL_TIM7;
     }
 #endif
 #if STM32_DAC_USE_CHN1 || STM32_DAC_USE_CHN2
@@ -197,7 +197,8 @@ void dac_lld_start(DACDriver *dacp) {
 
     /* DAC configuration */
     dacp->dac->CR |= ( (dacp->dac->CR & ~STM32_DAC_CR_MASK) | \
-      (STM32_DAC_CR_EN | STM32_DAC_CR_DMAEN | dacp->config->cr_flags) ) << regshift;
+      (STM32_DAC_CR_EN | STM32_DAC_CR_DMAEN | dacp->config->cr_flags) ) \
+          << regshift;
       
     /* DMA setup. */
     b = dmaStreamAllocate(dacp->dma,
@@ -208,34 +209,34 @@ void dac_lld_start(DACDriver *dacp) {
     switch (dacp->config->dhrm) {
       /* Sets the DAC data register */
       case DAC_DHRM_12BIT_RIGHT:
-      dmaStreamSetPeripheral(dacp->dma, &dacp->dac->DHR12R1 + dataoffset);
-      dacp->dmamode = (dacp->dmamode & ~STM32_DMA_CR_SIZE_MASK) |
-            STM32_DMA_CR_PSIZE_HWORD | STM32_DMA_CR_MSIZE_HWORD;
+        dmaStreamSetPeripheral(dacp->dma, &dacp->dac->DHR12R1 + dataoffset);
+        dacp->dmamode = (dacp->dmamode & ~STM32_DMA_CR_SIZE_MASK) |
+              STM32_DMA_CR_PSIZE_HWORD | STM32_DMA_CR_MSIZE_HWORD;
         break;
       case DAC_DHRM_12BIT_LEFT:
-      dmaStreamSetPeripheral(dacp->dma, &dacp->dac->DHR12L1 + dataoffset);
-      dacp->dmamode = (dacp->dmamode & ~STM32_DMA_CR_SIZE_MASK) |
-            STM32_DMA_CR_PSIZE_HWORD | STM32_DMA_CR_MSIZE_HWORD;
+        dmaStreamSetPeripheral(dacp->dma, &dacp->dac->DHR12L1 + dataoffset);
+        dacp->dmamode = (dacp->dmamode & ~STM32_DMA_CR_SIZE_MASK) |
+              STM32_DMA_CR_PSIZE_HWORD | STM32_DMA_CR_MSIZE_HWORD;
         break;
       case DAC_DHRM_8BIT_RIGHT:
-      dmaStreamSetPeripheral(dacp->dma, &dacp->dac->DHR8R1 + dataoffset);
-      dacp->dmamode = (dacp->dmamode & ~STM32_DMA_CR_SIZE_MASK) |
-            STM32_DMA_CR_PSIZE_BYTE | STM32_DMA_CR_MSIZE_BYTE;
+        dmaStreamSetPeripheral(dacp->dma, &dacp->dac->DHR8R1 + dataoffset);
+        dacp->dmamode = (dacp->dmamode & ~STM32_DMA_CR_SIZE_MASK) |
+              STM32_DMA_CR_PSIZE_BYTE | STM32_DMA_CR_MSIZE_BYTE;
         break;
       case DAC_DHRM_12BIT_RIGHT_DUAL:
-      dmaStreamSetPeripheral(dacp->dma, &dacp->dac->DHR12RD);
-      dacp->dmamode = (dacp->dmamode & ~STM32_DMA_CR_SIZE_MASK) |
-            STM32_DMA_CR_PSIZE_HWORD | STM32_DMA_CR_MSIZE_HWORD;
+        dmaStreamSetPeripheral(dacp->dma, &dacp->dac->DHR12RD);
+        dacp->dmamode = (dacp->dmamode & ~STM32_DMA_CR_SIZE_MASK) |
+              STM32_DMA_CR_PSIZE_HWORD | STM32_DMA_CR_MSIZE_HWORD;
         break;
       case DAC_DHRM_12BIT_LEFT_DUAL:
-      dmaStreamSetPeripheral(dacp->dma, &dacp->dac->DHR12LD);
-      dacp->dmamode = (dacp->dmamode & ~STM32_DMA_CR_SIZE_MASK) |
-            STM32_DMA_CR_PSIZE_HWORD | STM32_DMA_CR_MSIZE_HWORD;
+        dmaStreamSetPeripheral(dacp->dma, &dacp->dac->DHR12LD);
+        dacp->dmamode = (dacp->dmamode & ~STM32_DMA_CR_SIZE_MASK) |
+              STM32_DMA_CR_PSIZE_HWORD | STM32_DMA_CR_MSIZE_HWORD;
         break;
       case DAC_DHRM_8BIT_RIGHT_DUAL:
-      dmaStreamSetPeripheral(dacp->dma, &dacp->dac->DHR8RD);
-      dacp->dmamode = (dacp->dmamode & ~STM32_DMA_CR_SIZE_MASK) |
-           STM32_DMA_CR_PSIZE_BYTE | STM32_DMA_CR_MSIZE_BYTE;
+        dmaStreamSetPeripheral(dacp->dma, &dacp->dac->DHR8RD);
+        dacp->dmamode = (dacp->dmamode & ~STM32_DMA_CR_SIZE_MASK) |
+             STM32_DMA_CR_PSIZE_BYTE | STM32_DMA_CR_MSIZE_BYTE;
         break;
 	}
 	
@@ -256,19 +257,25 @@ void dac_lld_stop(DACDriver *dacp) {
   /* If in ready state then disables the DAC clock.*/
   if (dacp->state == DAC_READY) {
 
-    /* DAC disable.*/
+    /* DMA disable.*/
     dmaStreamRelease(dacp->dma);
-  /* TODO: how to handle rccDisableDAC */
+
 #if STM32_DAC_USE_CHN1
-    if (&DACD1 == dacp)
-      DAC->CR = (DAC->CR & 0xFFFFFFFE); 
-      /* rccDisableDAC(FALSE); */
+    if (&DACD1 == dacp) {
+      dacp->dac->CR = (dacp->dac->CR & ~STM32_DAC_CR_EN); /* DAC1 disable.*/
+    }
 #endif
 #if STM32_DAC_USE_CHN2
-    if (&DACD2 == dacp)
-      DAC->CR = (DAC->CR & 0xFFFEFFFF);
-      /* rccDisableDAC(FALSE); */
+    if (&DACD2 == dacp) {
+      dacp->dac->CR = (dacp->dac->CR & ~STM32_DAC_CR_EN \
+          << 16); /* DAC disable.*/
+    }
 #endif
+    dacp->tim->CR1 &= ~TIM_CR1_CEN; /* Disable timer */
+    dacp->state = DAC_STOP;
+  }
+  if (DAC->CR & STM32_DAC_CR_EN && DAC->CR & STM32_DAC_CR_EN << 16 ) {
+    rccDisableDAC(FALSE); /* DAC Clock disable only if all channels are off.*/
   }
 }
 
@@ -296,7 +303,8 @@ void dac_lld_send_circular(DACDriver *dacp, size_t n, const void *txbuf){
                    STM32_DMA_CR_CIRC);
 }
 
-void dac_lld_send_doublebuffer(DACDriver *dacp, size_t n, const void *txbuf0, const void *txbuf1) {
+void dac_lld_send_doublebuffer(DACDriver *dacp, size_t n, const void *txbuf0, \
+                               const void *txbuf1) {
   (void) dacp;
   (void) n;
   (void) txbuf0;

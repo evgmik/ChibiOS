@@ -65,7 +65,6 @@ DACDriver DACD2;
 /* Driver local functions.                                                   */
 /*===========================================================================*/
 
-
 /**
  * @brief   Shared end/half-of-tx service routine.
  *
@@ -175,68 +174,69 @@ void dac_lld_start(DACDriver *dacp) {
     }
 #endif
 #if STM32_DAC_USE_CHN1 || STM32_DAC_USE_CHN2
-		dacp->clock = STM32_TIMCLK1;
-		arr = (dacp->clock / dacp->config->frequency);
-		chDbgAssert((arr <= 0xFFFF) &&
-				(arr * dacp->config->frequency) == dacp->clock,
-				"dac_lld_start(), #1", "invalid frequency");
+    dacp->clock = STM32_TIMCLK1;
+    arr = (dacp->clock / dacp->config->frequency);
+    chDbgAssert((arr <= 0xFFFF) &&
+            (arr * dacp->config->frequency) == dacp->clock,
+            "dac_lld_start(), #1", "invalid frequency");
 
-		/* Timer configuration.*/
-		dacp->tim->CR1  = 0;                        /* Initially stopped.   */
-		dacp->tim->PSC  = 0;                        /* Prescaler value.     */
-		dacp->tim->DIER = 0;
-		dacp->tim->ARR  = arr;
-		dacp->tim->EGR  = TIM_EGR_UG;               /* Update event.        */
-		dacp->tim->CR2  &= (uint16_t)~TIM_CR2_MMS;
-		dacp->tim->CR2  |= (uint16_t)TIM_CR2_MMS_1; /* Enable TRGO updates. */
-		dacp->tim->CNT  = 0;                        /* Reset counter.       */
-		dacp->tim->SR   = 0;                        /* Clear pending IRQs.  */
-		/* Update Event IRQ enabled. */
-		/* Timer start.*/
-		dacp->tim->CR1  = TIM_CR1_CEN;
-		
-		/* DAC configuration */
-		dacp->dac->CR |= ( (dacp->dac->CR & ~STM32_DAC_CR_MASK) | \
-			(STM32_DAC_CR_EN | STM32_DAC_CR_DMAEN | dacp->config->cr_flags) ) << regshift;
-			
-		/* DMA setup. */
-		b = dmaStreamAllocate(dacp->dma,
-					dacp->irqprio,
-					(stm32_dmaisr_t)dac_lld_serve_tx_interrupt,
-					(void *)dacp);
-		chDbgAssert(!b, "dac_lld_start(), #2", "stream already allocated");
-		switch (dacp->config->dhrm) {
-			/* Sets the DAC data register */
-			case DAC_DHRM_12BIT_RIGHT:
-			dmaStreamSetPeripheral(dacp->dma, &dacp->dac->DHR12R1 + dataoffset);
-			dacp->dmamode = (dacp->dmamode & ~STM32_DMA_CR_SIZE_MASK) |
-						STM32_DMA_CR_PSIZE_HWORD | STM32_DMA_CR_MSIZE_HWORD;
-				break;
-			case DAC_DHRM_12BIT_LEFT:
-			dmaStreamSetPeripheral(dacp->dma, &dacp->dac->DHR12L1 + dataoffset);
-			dacp->dmamode = (dacp->dmamode & ~STM32_DMA_CR_SIZE_MASK) |
-						STM32_DMA_CR_PSIZE_HWORD | STM32_DMA_CR_MSIZE_HWORD;
-				break;
-			case DAC_DHRM_8BIT_RIGHT:
-			dmaStreamSetPeripheral(dacp->dma, &dacp->dac->DHR8R1 + dataoffset);
-			dacp->dmamode = (dacp->dmamode & ~STM32_DMA_CR_SIZE_MASK) |
-						STM32_DMA_CR_PSIZE_BYTE | STM32_DMA_CR_MSIZE_BYTE;
-				break;
-			case DAC_DHRM_12BIT_RIGHT_DUAL:
-			dmaStreamSetPeripheral(dacp->dma, &dacp->dac->DHR12RD);
-			dacp->dmamode = (dacp->dmamode & ~STM32_DMA_CR_SIZE_MASK) |
-						STM32_DMA_CR_PSIZE_HWORD | STM32_DMA_CR_MSIZE_HWORD;
-				break;
-			case DAC_DHRM_12BIT_LEFT_DUAL:
-			dmaStreamSetPeripheral(dacp->dma, &dacp->dac->DHR12LD);
-			dacp->dmamode = (dacp->dmamode & ~STM32_DMA_CR_SIZE_MASK) |
-						STM32_DMA_CR_PSIZE_HWORD | STM32_DMA_CR_MSIZE_HWORD;
-				break;
-			case DAC_DHRM_8BIT_RIGHT_DUAL:
-			dmaStreamSetPeripheral(dacp->dma, &dacp->dac->DHR8RD);
-			dacp->dmamode = (dacp->dmamode & ~STM32_DMA_CR_SIZE_MASK) |
-					 STM32_DMA_CR_PSIZE_BYTE | STM32_DMA_CR_MSIZE_BYTE;
-				break;
+    /* Timer configuration.*/
+    dacp->tim->CR1  = 0;                        /* Initially stopped.   */
+    dacp->tim->PSC  = 0;                        /* Prescaler value.     */
+    dacp->tim->DIER = 0;
+    dacp->tim->ARR  = arr;
+    dacp->tim->EGR  = TIM_EGR_UG;               /* Update event.        */
+    dacp->tim->CR2  &= (uint16_t)~TIM_CR2_MMS;
+    dacp->tim->CR2  |= (uint16_t)TIM_CR2_MMS_1; /* Enable TRGO updates. */
+    dacp->tim->CNT  = 0;                        /* Reset counter.       */
+    dacp->tim->SR   = 0;                        /* Clear pending IRQs.  */
+    /* Update Event IRQ enabled. */
+    /* Timer start.*/
+    dacp->tim->CR1  = TIM_CR1_CEN;
+
+    /* DAC configuration */
+    dacp->dac->CR |= ( (dacp->dac->CR & ~STM32_DAC_CR_MASK) | \
+        (STM32_DAC_CR_EN | STM32_DAC_CR_DMAEN | dacp->config->cr_flags) )\
+            << regshift;
+
+    /* DMA setup. */
+    b = dmaStreamAllocate(dacp->dma,
+                dacp->irqprio,
+                (stm32_dmaisr_t)dac_lld_serve_tx_interrupt,
+                (void *)dacp);
+    chDbgAssert(!b, "dac_lld_start(), #2", "stream already allocated");
+    switch (dacp->config->dhrm) {
+      /* Sets the DAC data register */
+      case DAC_DHRM_12BIT_RIGHT:
+        dmaStreamSetPeripheral(dacp->dma, &dacp->dac->DHR12R1 + dataoffset);
+        dacp->dmamode = (dacp->dmamode & ~STM32_DMA_CR_SIZE_MASK) |
+                    STM32_DMA_CR_PSIZE_HWORD | STM32_DMA_CR_MSIZE_HWORD;
+        break;
+      case DAC_DHRM_12BIT_LEFT:
+        dmaStreamSetPeripheral(dacp->dma, &dacp->dac->DHR12L1 + dataoffset);
+        dacp->dmamode = (dacp->dmamode & ~STM32_DMA_CR_SIZE_MASK) |
+                    STM32_DMA_CR_PSIZE_HWORD | STM32_DMA_CR_MSIZE_HWORD;
+        break;
+      case DAC_DHRM_8BIT_RIGHT:
+        dmaStreamSetPeripheral(dacp->dma, &dacp->dac->DHR8R1 + dataoffset);
+        dacp->dmamode = (dacp->dmamode & ~STM32_DMA_CR_SIZE_MASK) |
+                    STM32_DMA_CR_PSIZE_BYTE | STM32_DMA_CR_MSIZE_BYTE;
+        break;
+      case DAC_DHRM_12BIT_RIGHT_DUAL:
+        dmaStreamSetPeripheral(dacp->dma, &dacp->dac->DHR12RD);
+        dacp->dmamode = (dacp->dmamode & ~STM32_DMA_CR_SIZE_MASK) |
+                    STM32_DMA_CR_PSIZE_HWORD | STM32_DMA_CR_MSIZE_HWORD;
+        break;
+      case DAC_DHRM_12BIT_LEFT_DUAL:
+        dmaStreamSetPeripheral(dacp->dma, &dacp->dac->DHR12LD);
+        dacp->dmamode = (dacp->dmamode & ~STM32_DMA_CR_SIZE_MASK) |
+                    STM32_DMA_CR_PSIZE_HWORD | STM32_DMA_CR_MSIZE_HWORD;
+        break;
+      case DAC_DHRM_8BIT_RIGHT_DUAL:
+        dmaStreamSetPeripheral(dacp->dma, &dacp->dac->DHR8RD);
+        dacp->dmamode = (dacp->dmamode & ~STM32_DMA_CR_SIZE_MASK) |
+                 STM32_DMA_CR_PSIZE_BYTE | STM32_DMA_CR_MSIZE_BYTE;
+        break;
 	}
 	
 	dacp->dac->CR |= trgo << regshift; /* Enable trigger */
@@ -256,19 +256,24 @@ void dac_lld_stop(DACDriver *dacp) {
   /* If in ready state then disables the DAC clock.*/
   if (dacp->state == DAC_READY) {
 
-    /* DAC disable.*/
+    /* DMA disable.*/
     dmaStreamRelease(dacp->dma);
-  /* TODO: how to handle rccDisableDAC */
+
 #if STM32_DAC_USE_CHN1
-    if (&DACD1 == dacp)
-      DAC->CR = (DAC->CR & 0xFFFFFFFE); 
-      /* rccDisableDAC(FALSE); */
+    if (&DACD1 == dacp) {
+      dacp->dac->CR = (dacp->dac->CR & ~STM32_DAC_CR_EN); /* DAC disable.*/
+      rccDisableDAC(FALSE); /* DAC Clock disable.*/
+    }
 #endif
 #if STM32_DAC_USE_CHN2
-    if (&DACD2 == dacp)
-      DAC->CR = (DAC->CR & 0xFFFEFFFF);
-      /* rccDisableDAC(FALSE); */
+    if (&DACD2 == dacp) {
+      dacp->dac->CR = (dacp->dac->CR & ~STM32_DAC_CR_EN \
+          << 16); /* DAC disable.*/
+      rccDisableDAC(FALSE); /* DAC Clock disable.*/
+    }
 #endif
+    dacp->tim->CR1 &= ~TIM_CR1_CEN; /* Disable timer */
+    dacp->state = DAC_STOP;
   }
 }
 
@@ -292,16 +297,16 @@ void dac_lld_send(DACDriver *dacp, size_t n, const void *txbuf) {
 void dac_lld_send_circular(DACDriver *dacp, size_t n, const void *txbuf){
   dmaStreamSetMemory0(dacp->dma, txbuf);
   dmaStreamSetTransactionSize(dacp->dma, n);
-  dmaStreamSetMode(dacp->dma, dacp->dmamode | STM32_DMA_CR_EN |                \
+  dmaStreamSetMode(dacp->dma, dacp->dmamode | STM32_DMA_CR_EN |               \
                    STM32_DMA_CR_CIRC);
 }
 
-void dac_lld_send_doublebuffer(DACDriver *dacp, size_t n, const void *txbuf0,  \
+void dac_lld_send_doublebuffer(DACDriver *dacp, size_t n, const void *txbuf0, \
                                const void *txbuf1) {
   dmaStreamSetMemory0(dacp->dma, txbuf0);
   dmaStreamSetMemory1(dacp->dma, txbuf1);
   dmaStreamSetTransactionSize(dacp->dma, n);
-  dmaStreamSetMode(dacp->dma, dacp->dmamode | STM32_DMA_CR_EN |                \
+  dmaStreamSetMode(dacp->dma, dacp->dmamode | STM32_DMA_CR_EN |               \
                    STM32_DMA_CR_DBM);
 }
 

@@ -292,24 +292,31 @@ void dac_lld_stop(DACDriver *dacp) {
   /* If in ready state then disables the DAC clock.*/
   if (dacp->state == DAC_READY) {
 
-    /* DAC disable.*/
+    /* DMA disable.*/
     dmaStreamRelease(dacp->dma);
-  /* TODO: how to handle rccDisableDAC */
+
 #if STM32_DAC_USE_CHN1
-    if (&DACD1 == dacp)
-      DAC1->CR = (DAC1->CR & 0xFFFFFFFE); 
-      /* rccDisableDAC1(FALSE); */
+    if (&DACD1 == dacp) {
+      dacp->dac->CR = (dacp->dac->CR & ~STM32_DAC_CR_EN); /* DAC1 disable.*/
+    }
 #endif
 #if STM32_DAC_USE_CHN2
-    if (&DACD2 == dacp)
-      DAC1->CR = (DAC1->CR & 0xFFFEFFFF);
-      /* rccDisableDAC1(FALSE); */
+    if (&DACD2 == dacp) {
+      dacp->dac->CR = (dacp->dac->CR & ~STM32_DAC_CR_EN \
+          << 16); /* DAC disable.*/
+    }
 #endif
 #if STM32_DAC_USE_CHN3
-    if (&DACD3 == dacp)
-      DAC2->CR = (DAC2->CR & 0xFFFEFFFF);
-      /* rccDisableDAC2(FALSE); */
+    if (&DACD3 == dacp) {
+      dacp->dac->CR = (dacp->dac->CR & ~STM32_DAC_CR_EN); /* DAC2 disable.*/
+      rccDisableDAC2(FALSE); /* DAC Clock disable.*/
+    }
 #endif
+    dacp->tim->CR1 &= ~TIM_CR1_CEN; /* Disable timer */
+    dacp->state = DAC_STOP;
+  }
+  if (DAC1->CR & STM32_DAC_CR_EN && DAC1->CR & STM32_DAC_CR_EN << 16 ) {
+    rccDisableDAC1(FALSE); /* DAC Clock disable only if all channels are off.*/
   }
 }
 
@@ -337,7 +344,8 @@ void dac_lld_send_circular(DACDriver *dacp, size_t n, const void *txbuf){
                    STM32_DMA_CR_CIRC);
 }
 
-void dac_lld_send_doublebuffer(DACDriver *dacp, size_t n, const void *txbuf0, const void *txbuf1) {
+void dac_lld_send_doublebuffer(DACDriver *dacp, size_t n, const void *txbuf0, \
+                               const void *txbuf1) {
   (void) dacp;
   (void) n;
   (void) txbuf0;
