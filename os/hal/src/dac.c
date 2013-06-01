@@ -142,58 +142,13 @@ void dacStop(DACDriver *dacp) {
  *
  * @api
  */
-void dacStartSend(DACDriver *dacp, size_t n, const void *txbuf) {
+void dacStartSend(DACDriver *dacp) {
 
-  chDbgCheck((dacp != NULL) && (n > 0) && (txbuf != NULL),
-             "dacStartSend");
+  chDbgCheck((dacp != NULL), "dacStartSend");
 
   chSysLock();
   chDbgAssert(dacp->state == DAC_READY, "dacStartSend(), #1", "not ready");
-  dacStartSendI(dacp, n, txbuf);
-  chSysUnlock();
-}
-
-/**
- * @brief   Sends data over the DAC bus.
- * @details This asynchronous function starts a continuous transmit operation.
- * @post    At the end of each cycle the configured callback is invoked.
- *
- * @param[in] dacp      pointer to the @p DACDriver object
- * @param[in] n         number of words to send
- * @param[in] txbuf     the pointer to the transmit buffer
- *
- * @api
- */
-void dacStartSendCircular(DACDriver *dacp, size_t n, const void *txbuf) {
-
-  chDbgCheck((dacp != NULL) && (n > 0) && (txbuf != NULL),
-             "dacStartSendCircular");
-
-  chSysLock();
-  chDbgAssert(dacp->state == DAC_READY, "dacStartSendCircularI(), #1", "not ready");
-  dacStartSendCircularI(dacp, n, txbuf);
-  chSysUnlock();
-}
-
-/**
- * @brief   Sends data over the DAC bus.
- * @details This asynchronous function starts a transmit operation using a double buffer.
- * @post    At the end of each cycle the configured callback is invoked.
- *
- * @param[in] dacp      pointer to the @p DACDriver object
- * @param[in] n         number of words to send
- * @param[in] txbuf     the pointer to the transmit buffer
- *
- * @api
- */
-void dacStartSendDoubleBuffer(DACDriver *dacp, size_t n, const void *txbuf0,  const void *txbuf1) {
-
-  chDbgCheck((dacp != NULL) && (n > 0) && (txbuf0 != NULL)  && (txbuf1 != NULL),
-             "dacStartSendDoubleBuffer");
-
-  chSysLock();
-  chDbgAssert(dacp->state == DAC_READY, "dacStartSendDoubleBufferI(), #1", "not ready");
-  dacStartSendDoubleBufferI(dacp, n, txbuf0, txbuf1);
+  dacStartSendI(dacp);
   chSysUnlock();
 }
 
@@ -213,13 +168,13 @@ void dacStartSendDoubleBuffer(DACDriver *dacp, size_t n, const void *txbuf0,  co
  *
  * @api
  */
-void dacSend(DACDriver *dacp, size_t n, const void *txbuf) {
+void dacSend(DACDriver *dacp) {
 
-  chDbgCheck((dacp != NULL) && (n > 0) && (txbuf != NULL), "dacSend");
+  chDbgCheck((dacp != NULL), "dacSend");
   chSysLock();
   chDbgAssert(dacp->state == DAC_READY, "dacSend(), #1", "not ready");
   chDbgAssert(dacp->config->callback == NULL, "dacSend(), #2", "has callback");
-  dacStartSendI(dacp, n, txbuf);
+  dacStartSendI(dacp);
   _dac_wait_s(dacp);
   chSysUnlock();
 }

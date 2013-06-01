@@ -35,6 +35,17 @@
 /* Driver constants.                                                         */
 /*===========================================================================*/
 
+/**
+ * @name    DAC modes
+ * @{
+ */
+typedef enum {
+  DAC_MODE_ONESHOT = 0,             /**< Only send buffer once.    */
+  DAC_MODE_CONTINUOUS = 1,        /**< Send buffer continuously.    */
+  DAC_MODE_DOUBLEBUFFER = 2,      /**< Send both buffers continuously. */
+} dacmode_t;
+/** @} */
+
 /*===========================================================================*/
 /* Driver pre-compile time settings.                                         */
 /*===========================================================================*/
@@ -106,42 +117,17 @@ typedef enum {
  *
  * @iclass
  */
-#define dacStartSendI(dacp, n, txbuf) {                                     \
-  (dacp)->state = DAC_ACTIVE;                                               \
-  dac_lld_send(dacp, n, txbuf);                                             \
-}
-
-/**
- * @brief   Sends data over the DAC bus using a circular buffer.
- * @details This asynchronous function starts a transmit operation.
- * @post    At the end of each cycle the configured callback is invoked.
- *
- * @param[in] dacp      pointer to the @p DACDriver object
- * @param[in] n         number of words to send
- * @param[in] txbuf     the pointer to the transmit buffer
- *
- * @iclass
- */
-#define dacStartSendCircularI(dacp, n, txbuf) {                                     \
-  (dacp)->state = DAC_ACTIVE;                                               \
-  dac_lld_send_circular(dacp, n, txbuf);                                             \
-}
-
-/**
- * @brief   Sends data over the DAC bus using 2 buffers.
- * @details This asynchronous function starts a transmit operation.
- * @post    At the end of each cycle the configured callback is invoked.
- *
- * @param[in] dacp      pointer to the @p DACDriver object
- * @param[in] n         number of words to send. Must be the same for both buffers
- * @param[in] txbuf0     the pointer to the first transmit buffer
- * @param[in] txbuf1     the pointer to the second transmit buffer
- *
- * @iclass
- */
-#define dacStartSendDoubleBufferI(dacp, n, txbuf0, txbuf1) {                                     \
-  (dacp)->state = DAC_ACTIVE;                                               \
-  dac_lld_send_doublebuffer(dacp, n, txbuf0, txbuf1);                                             \
+#define dacStartSendI(dacp) {                               \
+  (dacp)->state = DAC_ACTIVE;                              \
+  if ((dacp)->config->mode == DAC_MODE_ONESHOT) { \
+    dac_lld_send(dacp);                                            \
+    } \
+  else if ((dacp)->config->mode == DAC_MODE_CONTINUOUS) { \
+    dac_lld_send_continuous(dacp);                                            \
+    } \
+  else if ((dacp)->config->mode == DAC_MODE_DOUBLEBUFFER) { \
+    dac_lld_send_doublebuffer(dacp);                                            \
+    } \
 }
 
 /**
@@ -271,11 +257,9 @@ extern "C" {
   void dacObjectInit(DACDriver *dacp);
   void dacStart(DACDriver *dacp, const DACConfig *config);
   void dacStop(DACDriver *dacp);
-  void dacStartSend(DACDriver *dacp, size_t n, const void *txbuf);
-  void dacStartSendCircular(DACDriver *dacp, size_t n, const void *txbuf);
-  void dacStartSendDoubleBuffer(DACDriver *dacp, size_t n, const void *txbuf0,  const void *txbuf1);
+  void dacStartSend(DACDriver *dacp);
 #if DAC_USE_WAIT
-  void dacSend(DACDriver *dacp, size_t n, const void *txbuf);
+  void dacSend(DACDriver *dacp);
 #endif /* DAC_USE_WAIT */
 #if DAC_USE_MUTUAL_EXCLUSION
   void dacAcquireBus(DACDriver *dacp);

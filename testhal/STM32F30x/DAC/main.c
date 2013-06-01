@@ -17,12 +17,12 @@
 #include "ch.h"
 #include "hal.h"
 
-#define DAC_TABLE_SIZE 360
+#define DAC_BUFFER_SIZE 360
 
 /*
  * DAC test buffer (sine wave)
  */
-const uint16_t dac_buffer[DAC_TABLE_SIZE] = {2047, 2082, 2118, 2154, 2189, 2225, 2260,
+const uint16_t dac_buffer[DAC_BUFFER_SIZE] = {2047, 2082, 2118, 2154, 2189, 2225, 2260,
 		2296, 2331, 2367, 2402, 2437, 2472, 2507, 2542, 2576, 2611, 2645, 2679, 2713,
 		2747, 2780, 2813, 2846, 2879, 2912, 2944, 2976, 3008, 3039, 3070, 3101, 3131,
 		3161, 3191, 3221, 3250, 3278, 3307, 3335, 3362, 3389, 3416, 3443, 3468, 3494,
@@ -85,19 +85,29 @@ static void dacerrcb2(DACDriver *dacp) {
  * DAC config, with callbacks.
  */
 static const DACConfig daccfg1 = {
-  960*DAC_TABLE_SIZE, /* Multiply the buffer size to the desired frequency in Hz */
+  DAC_MODE_CONTINUOUS,
+  960*DAC_BUFFER_SIZE, /* Multiply the buffer size to the desired frequency in Hz */
+  dac_buffer, /* Pointer to the first buffer */
+  NULL, /* Pointer to the second buffer */
+  DAC_BUFFER_SIZE, /* Buffers size */
   daccb1, /* End of transfer callback */
   dacerrcb1, /* Error callback */
+  /* STM32 specific config starts here */
   DAC_DHRM_12BIT_RIGHT, /* data holding register mode */
-  0 /* CR flags */
+  0 /* DAC CR flags */
 };
 
 static const DACConfig daccfg2 = {
-  2500*DAC_TABLE_SIZE, /* Multiply the buffer size to the desired frequency in Hz */
+  DAC_MODE_CONTINUOUS,
+  2500*DAC_BUFFER_SIZE, /* Multiply the buffer size to the desired frequency in Hz */
+  dac_buffer, /* Pointer to the first buffer */
+  NULL, /* Pointer to the second buffer */
+  DAC_BUFFER_SIZE, /* Buffers size */
   daccb2, /* End of transfer callback */
   dacerrcb2, /* Error callback */
+  /* STM32 specific config starts here */
   DAC_DHRM_12BIT_RIGHT, /* data holding register mode */
-  0 /* CR flags */
+  0 /* DAC CR flags */
 };
 
 /*
@@ -150,8 +160,8 @@ int main(void) {
   /*
    * Sending the dac_buffer
    */
-  dacStartSendCircular(&DACD1, DAC_TABLE_SIZE, dac_buffer);
-  dacStartSendCircular(&DACD2, DAC_TABLE_SIZE, dac_buffer);
+  dacStartSend(&DACD1);
+  dacStartSend(&DACD2);
 
   /*
    * Normal main() thread activity, in this demo it does nothing.

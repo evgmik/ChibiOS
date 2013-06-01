@@ -3,6 +3,7 @@ PLATFORMSRC = ${CHIBIOS}/os/hal/platforms/STM32L1xx/stm32_dma.c \
               ${CHIBIOS}/os/hal/platforms/STM32L1xx/hal_lld.c \
               ${CHIBIOS}/os/hal/platforms/STM32L1xx/adc_lld.c \
               ${CHIBIOS}/os/hal/platforms/STM32L1xx/ext_lld_isr.c \
+	      ${CHIBIOS}/os/hal/platforms/STM32/dac_lld.c \
               ${CHIBIOS}/os/hal/platforms/STM32/ext_lld.c \
               ${CHIBIOS}/os/hal/platforms/STM32/gpt_lld.c \
               ${CHIBIOS}/os/hal/platforms/STM32/icu_lld.c \
