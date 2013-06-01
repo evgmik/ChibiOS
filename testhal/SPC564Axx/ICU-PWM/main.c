@@ -30,8 +30,8 @@ static void pwmc1cb(PWMDriver *pwmp) {
 }
 
 static PWMConfig pwmcfg = {
-  80000,                                    /* 80kHz PWM clock frequency.*/
-  20000,                                    /* Initial PWM period 0.25s.*/
+  187500,                                   /* 187500Hz PWM clock frequency.*/
+  19500,                                    /* Initial PWM period 0.1040s.*/
   pwmpcb,
   {
    {PWM_OUTPUT_ACTIVE_HIGH, pwmc1cb}
@@ -40,7 +40,6 @@ static PWMConfig pwmcfg = {
 };
 
 icucnt_t last_width, last_period;
-icucnt_t last_width2, last_period2;
 
 static void icuwidthcb(ICUDriver *icup) {
 
@@ -56,7 +55,7 @@ static void icuperiodcb(ICUDriver *icup) {
 
 static ICUConfig icucfg = {
   ICU_INPUT_ACTIVE_HIGH,
-  80000,                                    /* 80kHz ICU clock frequency.*/
+  187500,                                    /* 187500Hz ICU clock frequency.*/
   icuwidthcb,
   icuperiodcb,
   NULL
@@ -66,15 +65,12 @@ static ICUConfig icucfg = {
  * Application entry point.
  */
 int main(void) {
-  /*
-   * System initializations.
-   * - HAL initialization, this also initializes the configured device drivers
-   *   and performs the board-specific initializations.
-   * - Kernel initialization, the main() function becomes a thread and the
-   *   RTOS is active.
-   */
-  halInit();
-  chSysInit();
+
+  /* Initialization of all the imported components in the order specified in
+	 the application wizard. The function is generated automatically.*/
+  componentsInit();
+
+  palClearPad(PORT11, P11_LED4);
 
   /*
    * Initializes the PWM driver 6 and ICU driver 3.

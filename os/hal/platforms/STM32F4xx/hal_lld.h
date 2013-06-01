@@ -1335,7 +1335,7 @@
 /**
  * @brief   PLLI2S output clock frequency.
  */
-#define STM32_PLLI2SCLKOUT          (STM32_PLLI2SVCO / STM32_PLLI2SR)
+#define STM32_PLLI2SCLKOUT          (STM32_PLLI2SVCO / STM32_PLLI2SR_VALUE)
 
 /*
  * PLLI2S output frequency range check.
