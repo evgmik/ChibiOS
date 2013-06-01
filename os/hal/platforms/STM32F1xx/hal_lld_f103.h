@@ -507,6 +507,14 @@
 /* DAC attributes.*/
 #define STM32_HAS_DAC           TRUE
 
+#define STM32_HAS_DAC_CHN1          TRUE
+#define STM32_DAC_CHN1_DMA_MSK      STM32_DMA_STREAM_ID_MSK(2, 3)
+#define STM32_DAC_CHN1_DMA_CHN      0x00000000
+
+#define STM32_HAS_DAC_CHN2          TRUE
+#define STM32_DAC_CHN2_DMA_MSK      STM32_DMA_STREAM_ID_MSK(2, 4)
+#define STM32_DAC_CHN2_DMA_CHN      0x00000000
+
 /* DMA attributes.*/
 #define STM32_ADVANCED_DMA      FALSE
 #define STM32_HAS_DMA1          TRUE
@@ -656,6 +664,14 @@
 
 /* DAC attributes.*/
 #define STM32_HAS_DAC           TRUE
+
+#define STM32_HAS_DAC_CHN1          TRUE
+#define STM32_DAC_CHN1_DMA_MSK      STM32_DMA_STREAM_ID_MSK(2, 3)
+#define STM32_DAC_CHN1_DMA_CHN      0x00000000
+
+#define STM32_HAS_DAC_CHN2          TRUE
+#define STM32_DAC_CHN2_DMA_MSK      STM32_DMA_STREAM_ID_MSK(2, 4)
+#define STM32_DAC_CHN2_DMA_CHN      0x00000000
 
 /* DMA attributes.*/
 #define STM32_ADVANCED_DMA      FALSE
