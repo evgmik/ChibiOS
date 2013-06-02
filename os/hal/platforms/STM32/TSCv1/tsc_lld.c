@@ -86,6 +86,7 @@ void tsc_lld_start(TSCDriver *tscp) {
 
   if (tscp->state == TSC_STOP) {
     /* Enables the peripheral.*/
+    rccEnableTSC(FALSE);
 #if STM32_TSC_USE_TSC1
     if (&TSCD1 == tscp) {
 
@@ -115,6 +116,7 @@ void tsc_lld_stop(TSCDriver *tscp) {
     }
 #endif /* STM32_TSC_USE_TSC1 */
   }
+  rccDisableTSC(FALSE);
 }
 
 #endif /* HAL_USE_TSC */
