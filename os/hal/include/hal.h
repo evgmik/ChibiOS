@@ -57,6 +57,7 @@
 #include "serial.h"
 #include "sdc.h"
 #include "spi.h"
+#include "tsc.h"
 #include "uart.h"
 #include "usb.h"
 

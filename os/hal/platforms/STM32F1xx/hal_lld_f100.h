@@ -284,6 +284,9 @@
 #define STM32_HAS_TIM18         FALSE
 #define STM32_HAS_TIM19         FALSE
 
+/* TSC attributes.*/
+#define STM32_HAS_TSC          FALSE
+
 /* USART attributes.*/
 #define STM32_HAS_USART1        TRUE
 #define STM32_USART1_RX_DMA_MSK (STM32_DMA_STREAM_ID_MSK(1, 5))
@@ -431,6 +434,9 @@
 #define STM32_HAS_TIM15         TRUE
 #define STM32_HAS_TIM16         TRUE
 #define STM32_HAS_TIM17         TRUE
+
+/* TSC attributes.*/
+#define STM32_HAS_TSC          FALSE
 
 /* USART attributes.*/
 #define STM32_HAS_USART1        TRUE

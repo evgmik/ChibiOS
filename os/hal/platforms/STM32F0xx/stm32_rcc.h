@@ -468,6 +468,34 @@
 /** @} */
 
 /**
+ * @brief   Enables the TSC peripheral clock.
+ * @note    The @p lp parameter is ignored in this family.
+ *
+ * @param[in] lp        low power enable flag
+ *
+ * @api
+ */
+#define rccEnableTSC(lp) rccEnableAHB(RCC_AHBENR_TSEN, lp)
+
+/**
+ * @brief   Disables the TSC peripheral clock.
+ * @note    The @p lp parameter is ignored in this family.
+ *
+ * @param[in] lp        low power enable flag
+ *
+ * @api
+ */
+#define rccDisableTSC(lp) rccDisableAHB(RCC_AHBENR_TSEN, lp)
+
+/**
+ * @brief   Resets the TSC peripheral.
+ *
+ * @api
+ */
+#define rccResetTSC() rccResetAHB(RCC_AHBRSTR_TSRST)
+/** @} */
+
+/**
  * @name    USART/UART peripherals specific RCC operations
  * @{
  */
