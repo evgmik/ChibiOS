@@ -1,5 +1,5 @@
 /*
-    LPC122x - Copyright (C) 2013 Marcin Jokel
+    ChibiOS/RT - Copyright (C) 2006-2013 Giovanni Di Sirio
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -30,6 +30,9 @@
 
 #include "mcuconf.h"
 
+/**
+ * @name    Drivers enable switches
+ */
 /**
  * @brief   Enables the TM subsystem.
  */
@@ -69,7 +72,7 @@
  * @brief   Enables the GPT subsystem.
  */
 #if !defined(HAL_USE_GPT) || defined(__DOXYGEN__)
-#define HAL_USE_GPT                 TRUE
+#define HAL_USE_GPT                 FALSE
 #endif
 
 /**
@@ -83,7 +86,7 @@
  * @brief   Enables the ICU subsystem.
  */
 #if !defined(HAL_USE_ICU) || defined(__DOXYGEN__)
-#define HAL_USE_ICU                 FALSE
+#define HAL_USE_ICU                 TRUE
 #endif
 
 /**
@@ -104,7 +107,7 @@
  * @brief   Enables the PWM subsystem.
  */
 #if !defined(HAL_USE_PWM) || defined(__DOXYGEN__)
-#define HAL_USE_PWM                 FALSE
+#define HAL_USE_PWM                 TRUE
 #endif
 
 /**
@@ -155,9 +158,13 @@
 #if !defined(HAL_USE_USB) || defined(__DOXYGEN__)
 #define HAL_USE_USB                 FALSE
 #endif
+/** @} */
 
 /*===========================================================================*/
-/* ADC driver related settings.                                              */
+/**
+ * @name ADC driver related setting
+ * @{
+ */
 /*===========================================================================*/
 
 /**
@@ -173,11 +180,15 @@
  * @note    Disabling this option saves both code and data space.
  */
 #if !defined(ADC_USE_MUTUAL_EXCLUSION) || defined(__DOXYGEN__)
-#define ADC_USE_MUTUAL_EXCLUSION    TRUE
+#define ADC_USE_MUTUAL_EXCLUSION    FALSE
 #endif
+/** @} */
 
 /*===========================================================================*/
-/* CAN driver related settings.                                              */
+/**
+ * @name CAN driver related setting
+ * @{
+ */
 /*===========================================================================*/
 
 /**
@@ -186,20 +197,28 @@
 #if !defined(CAN_USE_SLEEP_MODE) || defined(__DOXYGEN__)
 #define CAN_USE_SLEEP_MODE          TRUE
 #endif
+/** @} */
 
 /*===========================================================================*/
-/* I2C driver related settings.                                              */
+/**
+ * @name I2C driver related setting
+ * @{
+ */
 /*===========================================================================*/
 
 /**
  * @brief   Enables the mutual exclusion APIs on the I2C bus.
  */
 #if !defined(I2C_USE_MUTUAL_EXCLUSION) || defined(__DOXYGEN__)
-#define I2C_USE_MUTUAL_EXCLUSION    TRUE
+#define I2C_USE_MUTUAL_EXCLUSION    FALSE
 #endif
+/** @} */
 
 /*===========================================================================*/
-/* MAC driver related settings.                                              */
+/**
+ * @name MAC driver related setting
+ * @{
+ */
 /*===========================================================================*/
 
 /**
@@ -215,9 +234,13 @@
 #if !defined(MAC_USE_EVENTS) || defined(__DOXYGEN__)
 #define MAC_USE_EVENTS              TRUE
 #endif
+/** @} */
 
 /*===========================================================================*/
-/* MMC_SPI driver related settings.                                          */
+/**
+ * @name MMC_SPI driver related setting
+ * @{
+ */
 /*===========================================================================*/
 
 /**
@@ -231,9 +254,13 @@
 #if !defined(MMC_NICE_WAITING) || defined(__DOXYGEN__)
 #define MMC_NICE_WAITING            TRUE
 #endif
+/** @} */
 
 /*===========================================================================*/
-/* SDC driver related settings.                                              */
+/**
+ * @name SDC driver related setting
+ * @{
+ */
 /*===========================================================================*/
 
 /**
@@ -241,7 +268,7 @@
  * @note    Attempts are performed at 10mS intervals.
  */
 #if !defined(SDC_INIT_RETRY) || defined(__DOXYGEN__)
-#define SDC_INIT_RETRY              100
+#define SDC_INIT_RETRY              1
 #endif
 
 /**
@@ -262,9 +289,13 @@
 #if !defined(SDC_NICE_WAITING) || defined(__DOXYGEN__)
 #define SDC_NICE_WAITING            TRUE
 #endif
+/** @} */
 
 /*===========================================================================*/
-/* SERIAL driver related settings.                                           */
+/**
+ * @name SERIAL driver related setting
+ * @{
+ */
 /*===========================================================================*/
 
 /**
@@ -286,9 +317,32 @@
 #if !defined(SERIAL_BUFFERS_SIZE) || defined(__DOXYGEN__)
 #define SERIAL_BUFFERS_SIZE         16
 #endif
+/** @} */
 
 /*===========================================================================*/
-/* SPI driver related settings.                                              */
+/**
+ * @name SERIAL_USB driver related setting
+ * @{
+ */
+/*===========================================================================*/
+
+/**
+ * @brief   Serial over USB buffers size.
+ * @details Configuration parameter, the buffer size must be a multiple of
+ *          the USB data endpoint maximum packet size.
+ * @note    The default is 64 bytes for both the transmission and receive
+ *          buffers.
+ */
+#if !defined(SERIAL_USB_BUFFERS_SIZE) || defined(__DOXYGEN__)
+#define SERIAL_USB_BUFFERS_SIZE     64
+#endif
+/** @} */
+
+/*===========================================================================*/
+/**
+ * @name SPI driver related setting
+ * @{
+ */
 /*===========================================================================*/
 
 /**
@@ -304,8 +358,9 @@
  * @note    Disabling this option saves both code and data space.
  */
 #if !defined(SPI_USE_MUTUAL_EXCLUSION) || defined(__DOXYGEN__)
-#define SPI_USE_MUTUAL_EXCLUSION    TRUE
+#define SPI_USE_MUTUAL_EXCLUSION    FALSE
 #endif
+/** @} */
 
 #endif /* _HALCONF_H_ */
 

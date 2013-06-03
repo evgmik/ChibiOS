@@ -1,6 +1,7 @@
 /*
     ChibiOS/RT - Copyright (C) 2006-2013 Giovanni Di Sirio
-    LPC122x EXT driver - Copyright (C) 2013 Marcin Jokel
+    EXT haltest - Copyright (C) 2013 Marcin Jokel
+                - Copyright (C) 2013 mike brown
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -18,53 +19,33 @@
 #include "ch.h"
 #include "hal.h"
 
-static void led1off(void *arg) {
+static void ledoff(void *arg) {
 
   (void)arg;
-  palSetPad(GPIO1, GPIO1_LED1);
+  palClearPad(GPIO0, GPIO0_LED);
 }
 
-/* Triggered when the button is pressed or released. The LED1 is set to ON.*/
-static void ext2cb12(EXTDriver *extp, expchannel_t channel) {
+/* Triggered when the button is pressed or released. The LED is set to ON.*/
+static void ext_cb0(EXTDriver *extp, expchannel_t channel) {
   static VirtualTimer vt4;
 
   (void)extp;
   (void)channel;
 
-  palClearPad(GPIO1, GPIO1_LED1);
+  palSetPad(GPIO0, GPIO0_LED);
   chSysLockFromIsr();
   if (chVTIsArmedI(&vt4))
     chVTResetI(&vt4);
 
-  /* LED1 set to OFF after 200mS.*/
-  chVTSetI(&vt4, MS2ST(200), led1off, NULL);
+  /* LED set to OFF after 200mS.*/
+  chVTSetI(&vt4, MS2ST(200), ledoff, NULL);
   chSysUnlockFromIsr();
 }
 
 static const EXTConfig extcfg = {
   {
     {EXT_CH_MODE_DISABLED, NULL},
-    {EXT_CH_MODE_DISABLED, NULL},
-    {EXT_CH_MODE_DISABLED, NULL},
-    {EXT_CH_MODE_DISABLED, NULL},
-    {EXT_CH_MODE_DISABLED, NULL},
-    {EXT_CH_MODE_DISABLED, NULL},
-    {EXT_CH_MODE_DISABLED, NULL},
-    {EXT_CH_MODE_DISABLED, NULL},
-    {EXT_CH_MODE_DISABLED, NULL},
-    {EXT_CH_MODE_DISABLED, NULL},
-    {EXT_CH_MODE_DISABLED, NULL},
-    {EXT_CH_MODE_DISABLED, NULL},
-    {EXT_CH_MODE_BOTH_EDGES | EXT_CH_MODE_AUTOSTART, ext2cb12},
-    {EXT_CH_MODE_DISABLED, NULL},
-    {EXT_CH_MODE_DISABLED, NULL},
-    {EXT_CH_MODE_DISABLED, NULL},
-    {EXT_CH_MODE_DISABLED, NULL},
-    {EXT_CH_MODE_DISABLED, NULL},
-    {EXT_CH_MODE_DISABLED, NULL},
-    {EXT_CH_MODE_DISABLED, NULL},
-    {EXT_CH_MODE_DISABLED, NULL},
-    {EXT_CH_MODE_DISABLED, NULL},
+    {EXT_CH_MODE_BOTH_EDGES | EXT_CH_MODE_AUTOSTART, ext_cb0},
     {EXT_CH_MODE_DISABLED, NULL},
     {EXT_CH_MODE_DISABLED, NULL},
     {EXT_CH_MODE_DISABLED, NULL},
@@ -94,9 +75,9 @@ int main(void) {
   chSysInit();
 
   /*
-   * Activates the EXT driver 1.
+   * Activates the EXT driver 0.
    */
-  extStart(&EXTD2, &extcfg);
+  extStart(&EXTD0, &extcfg);
 
   /*
    * Normal main() thread activity, in this demo it enables and disables the
@@ -104,8 +85,8 @@ int main(void) {
    */
   while (TRUE) {
     chThdSleepMilliseconds(5000);
-    extChannelDisable(&EXTD2, GPIO2_SW_USER1);
+    extChannelDisable(&EXTD0, GPIO0_SW_ISP);
     chThdSleepMilliseconds(5000);
-    extChannelEnable(&EXTD2, GPIO2_SW_USER1);
+    extChannelEnable(&EXTD0, GPIO0_SW_ISP);
   }
 }
