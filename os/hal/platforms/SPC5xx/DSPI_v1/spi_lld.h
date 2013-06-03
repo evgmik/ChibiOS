@@ -223,6 +223,7 @@
 #if !defined(SPC5_SPI_USE_DSPI1) || defined(__DOXYGEN__)
 #define SPC5_SPI_USE_DSPI1                  FALSE
 #endif
+
 /**
  * @brief   SPID3 driver enable switch.
  * @details If set to @p TRUE the support for DSPI2 is included.
@@ -237,6 +238,62 @@
  */
 #if !defined(SPC5_SPI_USE_DSPI3) || defined(__DOXYGEN__)
 #define SPC5_SPI_USE_DSPI3                  FALSE
+#endif
+
+/**
+ * @brief   DSPI0 MCR PCS defaults.
+ */
+#if !defined(SPC5_SPI_DSPI0_MCR) || defined(__DOXYGEN__)
+#define SPC5_SPI_DSPI0_MCR                  (SPC5_MCR_PCSIS0 |              \
+                                             SPC5_MCR_PCSIS1 |              \
+                                             SPC5_MCR_PCSIS2 |              \
+                                             SPC5_MCR_PCSIS3 |              \
+                                             SPC5_MCR_PCSIS4 |              \
+                                             SPC5_MCR_PCSIS5 |              \
+                                             SPC5_MCR_PCSIS6 |              \
+                                             SPC5_MCR_PCSIS7)
+#endif
+
+/**
+ * @brief   DSPI1 MCR PCS defaults.
+ */
+#if !defined(SPC5_SPI_DSPI1_MCR) || defined(__DOXYGEN__)
+#define SPC5_SPI_DSPI1_MCR                  (SPC5_MCR_PCSIS0 |              \
+                                             SPC5_MCR_PCSIS1 |              \
+                                             SPC5_MCR_PCSIS2 |              \
+                                             SPC5_MCR_PCSIS3 |              \
+                                             SPC5_MCR_PCSIS4 |              \
+                                             SPC5_MCR_PCSIS5 |              \
+                                             SPC5_MCR_PCSIS6 |              \
+                                             SPC5_MCR_PCSIS7)
+#endif
+
+/**
+ * @brief   DSP2 MCR PCS defaults.
+ */
+#if !defined(SPC5_SPI_DSPI2_MCR) || defined(__DOXYGEN__)
+#define SPC5_SPI_DSPI2_MCR                  (SPC5_MCR_PCSIS0 |              \
+                                             SPC5_MCR_PCSIS1 |              \
+                                             SPC5_MCR_PCSIS2 |              \
+                                             SPC5_MCR_PCSIS3 |              \
+                                             SPC5_MCR_PCSIS4 |              \
+                                             SPC5_MCR_PCSIS5 |              \
+                                             SPC5_MCR_PCSIS6 |              \
+                                             SPC5_MCR_PCSIS7)
+#endif
+
+/**
+ * @brief   DSPI3 MCR PCS defaults.
+ */
+#if !defined(SPC5_SPI_DSPI3_MCR) || defined(__DOXYGEN__)
+#define SPC5_SPI_DSPI3_MCR                  (SPC5_MCR_PCSIS0 |              \
+                                             SPC5_MCR_PCSIS1 |              \
+                                             SPC5_MCR_PCSIS2 |              \
+                                             SPC5_MCR_PCSIS3 |              \
+                                             SPC5_MCR_PCSIS4 |              \
+                                             SPC5_MCR_PCSIS5 |              \
+                                             SPC5_MCR_PCSIS6 |              \
+                                             SPC5_MCR_PCSIS7)
 #endif
 
 /**
@@ -380,24 +437,18 @@ typedef void (*spicallback_t)(SPIDriver *spip);
  */
 typedef struct {
   /**
-   * @brief Operation complete callback.
+   * @brief   Operation complete callback.
    */
   spicallback_t         end_cb;
   /* End of the mandatory fields.*/
   /**
-   * @brief The chip select line port.
+   * @brief   The chip select line port.
    */
   ioportid_t            ssport;
   /**
-   * @brief The chip select line pad number.
+   * @brief   The chip select line pad number.
    */
   uint16_t              sspad;
-  /**
-   * @brief   DSPI MCR value for this session.
-   * @note    Some bits are ignored: CONT_SCKE, DCONF, ROOE, MDIS, DIS_TXF,
-   *          DIS_RXF, CLR_TXF, CLR_RXF, HALT.
-   */
-  uint32_t              mcr;
   /**
    * @brief   DSPI CTAR0 value for this session.
    */
@@ -417,23 +468,23 @@ typedef struct {
  */
 struct SPIDriver {
   /**
-   * @brief Driver state.
+   * @brief   Driver state.
    */
   spistate_t            state;
   /**
-   * @brief Current configuration data.
+   * @brief   Current configuration data.
    */
   const SPIConfig       *config;
 #if SPI_USE_WAIT || defined(__DOXYGEN__)
   /**
-   * @brief Waiting thread.
+   * @brief   Waiting thread.
    */
   Thread                *thread;
 #endif /* SPI_USE_WAIT */
 #if SPI_USE_MUTUAL_EXCLUSION || defined(__DOXYGEN__)
 #if CH_USE_MUTEXES || defined(__DOXYGEN__)
   /**
-   * @brief Mutex protecting the bus.
+   * @brief   Mutex protecting the bus.
    */
   Mutex                 mutex;
 #elif CH_USE_SEMAPHORES
