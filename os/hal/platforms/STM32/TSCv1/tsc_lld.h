@@ -91,8 +91,22 @@
 #define STM32_TSC_ICR_EOAIC (uint32_t)0x01
 #define STM32_TSC_ICR_MCEIC (uint32_t)0x02
 
-#define STM32_TSC_ICR_EOAF (uint32_t)0x01
-#define STM32_TSC_ICR_MCEF (uint32_t)0x02
+#define STM32_TSC_ISR_EOAF (uint32_t)0x01
+#define STM32_TSC_ISR_MCEF (uint32_t)0x02
+
+#define STM32_TSC_IOGCSR_G1E (uint32_t)0x01
+#define STM32_TSC_IOGCSR_G2E (uint32_t)0x02
+#define STM32_TSC_IOGCSR_G3E (uint32_t)0x04
+#define STM32_TSC_IOGCSR_G4E (uint32_t)0x08
+#define STM32_TSC_IOGCSR_G5E (uint32_t)0x10
+#define STM32_TSC_IOGCSR_G6E (uint32_t)0x20
+
+#define STM32_TSC_IOGCSR_G1S (uint32_t)0x10000
+#define STM32_TSC_IOGCSR_G2S (uint32_t)0x20000
+#define STM32_TSC_IOGCSR_G3S (uint32_t)0x40000
+#define STM32_TSC_IOGCSR_G4S (uint32_t)0x80000
+#define STM32_TSC_IOGCSR_G5S (uint32_t)0x100000
+#define STM32_TSC_IOGCSR_G6S (uint32_t)0x200000
 
 /*===========================================================================*/
 /* Driver pre-compile time settings.                                         */
