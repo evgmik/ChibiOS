@@ -1,6 +1,7 @@
 /*
     ChibiOS/RT - Copyright (C) 2006-2013 Giovanni Di Sirio
-    LPC122x PWM driver - Copyright (C) 2013 Marcin Jokel
+    LPC11xx EXT driver - Copyright (C) 2013 Marcin Jokel
+                       - Copyright (C) 2013 mike brown
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -21,18 +22,18 @@
 static void pwm2pcb(PWMDriver *pwmp) {
 
   (void)pwmp;
-  palSetPad(GPIO1, GPIO1_LED2);
+  palClearPad(GPIO0, GPIO0_LED);
 }
 
 static void pwm2c0cb(PWMDriver *pwmp) {
 
   (void)pwmp;
-  palClearPad(GPIO1, GPIO1_LED2);
+  palSetPad(GPIO0, GPIO0_LED);
 }
 
 static PWMConfig pwmcfg = {
-  10000,                                    /* 100kHz PWM clock frequency.   */
-  1000,                                     /* PWM 10 Hz    */
+  10000,                                    /* 10kHz PWM clock frequency.   */
+  1000,                                     /* Initial PWM period 4,8us     */
   pwm2pcb,
   {
    {PWM_OUTPUT_ACTIVE_LOW, pwm2c0cb},
@@ -65,18 +66,21 @@ int main(void) {
    * Starts the PWM channel 1 using 75% duty cycle.
    */
   pwmEnableChannel(&PWMD2, 0, 250);
+  pwmEnableChannel(&PWMD2, 1, 250);
   chThdSleepMilliseconds(5000);
 
   /*
    * Changes the PWM channel 1 to 50% duty cycle.
    */
   pwmEnableChannel(&PWMD2, 0, 500);
+  pwmEnableChannel(&PWMD2, 1, 500);
   chThdSleepMilliseconds(5000);
 
   /*
    * Changes the PWM channel 0 to 75% duty cycle.
    */
   pwmEnableChannel(&PWMD2, 0, 250);
+  pwmEnableChannel(&PWMD2, 1, 250);
   chThdSleepMilliseconds(5000);
 
   /*
@@ -84,6 +88,12 @@ int main(void) {
    * implicitly.
    */
   pwmChangePeriod(&PWMD2, 500);
+  chThdSleepMilliseconds(5000);
+
+  /*
+   * Disables channel 1.
+   */
+  pwmDisableChannel(&PWMD2, 1);
   chThdSleepMilliseconds(5000);
 
   /*

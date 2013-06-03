@@ -1,5 +1,7 @@
 /*
-    LPC122x - Copyright (C) 2013 Marcin Jokel
+    ChibiOS/RT - Copyright (C) 2006-2013 Giovanni Di Sirio
+    LPC11xx EXT driver - Copyright (C) 2013 Marcin Jokel
+                       - Copyright (C) 2013 mike brown
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -69,7 +71,7 @@
  * @brief   Enables the GPT subsystem.
  */
 #if !defined(HAL_USE_GPT) || defined(__DOXYGEN__)
-#define HAL_USE_GPT                 TRUE
+#define HAL_USE_GPT                 FALSE
 #endif
 
 /**
@@ -104,7 +106,7 @@
  * @brief   Enables the PWM subsystem.
  */
 #if !defined(HAL_USE_PWM) || defined(__DOXYGEN__)
-#define HAL_USE_PWM                 FALSE
+#define HAL_USE_PWM                 TRUE
 #endif
 
 /**
