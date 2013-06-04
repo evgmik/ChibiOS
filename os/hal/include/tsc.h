@@ -50,6 +50,7 @@ typedef enum {
   TSC_UNINIT = 0,                   /**< Not initialized.                   */
   TSC_STOP = 1,                     /**< Stopped.                           */
   TSC_READY = 2,                    /**< Ready.                             */
+  TSC_RUNNING = 3,                    /**< Running.                             */
 } tscstate_t;
 
 /**

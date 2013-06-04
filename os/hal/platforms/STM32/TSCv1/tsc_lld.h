@@ -145,6 +145,22 @@ typedef struct TSCDriver TSCDriver;
 typedef struct {
   /* Callback function pointer */
   const void* callback;
+  /* Group 1 parameters */
+  uint32_t g1;
+  /* Group 2 parameters */
+  uint32_t g2;
+  /* Group 3 parameters */
+  uint32_t g3;
+  /* Group 4 parameters */
+  uint32_t g4;
+  /* Group 5 parameters */
+  uint32_t g5;
+    /* Group 6 parameters */
+  uint32_t g6;
+  /* Group 7 parameters */
+  uint32_t g7;
+  /* Group 8 parameters */
+  uint32_t g8;
 
 } TSCConfig;
 
