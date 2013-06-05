@@ -46,6 +46,7 @@
 #include "tm.h"
 #include "pal.h"
 #include "adc.h"
+#include "dac.h"
 #include "can.h"
 #include "ext.h"
 #include "gpt.h"

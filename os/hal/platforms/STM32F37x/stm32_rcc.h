@@ -191,6 +191,66 @@
 /** @} */
 
 /**
+ * @name    DAC1 peripheral specific RCC operations
+ * @{
+ */
+/**
+ * @brief   Enables the DAC peripheral clock.
+ *
+ * @param[in] lp        low power enable flag
+ *
+ * @api
+ */
+#define rccEnableDAC1(lp) rccEnableAPB1(RCC_APB1ENR_DAC1EN, lp)
+
+/**
+ * @brief   Disables the DAC peripheral clock.
+ *
+ * @param[in] lp        low power enable flag
+ *
+ * @api
+ */
+#define rccDisableDAC1(lp) rccDisableAPB1(RCC_APB1ENR_DAC1EN, lp)
+
+/**
+ * @brief   Resets the DAC peripheral.
+ *
+ * @api
+ */
+#define rccResetDAC1() rccResetAPB1(RCC_APB1RSTR_DAC1RST)
+/** @} */
+
+/**
+ * @name    DAC2 peripheral specific RCC operations
+ * @{
+ */
+/**
+ * @brief   Enables the DAC peripheral clock.
+ *
+ * @param[in] lp        low power enable flag
+ *
+ * @api
+ */
+#define rccEnableDAC2(lp) rccEnableAPB1(RCC_APB1ENR_DAC2EN, lp)
+
+/**
+ * @brief   Disables the DAC peripheral clock.
+ *
+ * @param[in] lp        low power enable flag
+ *
+ * @api
+ */
+#define rccDisableDAC2(lp) rccDisableAPB1(RCC_APB1ENR_DAC2EN, lp)
+
+/**
+ * @brief   Resets the DAC peripheral.
+ *
+ * @api
+ */
+#define rccResetDAC2() rccResetAPB1(RCC_APB1RSTR_DAC2RST)
+/** @} */
+
+/**
  * @name    CAN peripherals specific RCC operations
  * @{
  */
@@ -732,6 +792,32 @@
  * @api
  */
 #define rccResetTIM14() rccResetAPB1(RCC_APB1RSTR_TIM14RST)
+/** @} */
+
+/**
+ * @brief   Enables the TIM18 peripheral clock.
+ *
+ * @param[in] lp        low power enable flag
+ *
+ * @api
+ */
+#define rccEnableTIM18(lp) rccEnableAPB1(RCC_APB1ENR_TIM18EN, lp)
+
+/**
+ * @brief   Disables the TIM18 peripheral clock.
+ *
+ * @param[in] lp        low power enable flag
+ *
+ * @api
+ */
+#define rccDisableTIM18(lp) rccDisableAPB1(RCC_APB1ENR_TIM18EN, lp)
+
+/**
+ * @brief   Resets the TIM18 peripheral.
+ *
+ * @api
+ */
+#define rccResetTIM18() rccResetAPB1(RCC_APB1RSTR_TIM18RST)
 /** @} */
 
 /**

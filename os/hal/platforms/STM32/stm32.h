@@ -151,6 +151,7 @@ typedef struct {
 #define STM32_TIM12     ((stm32_tim_t *)TIM12_BASE)
 #define STM32_TIM13     ((stm32_tim_t *)TIM13_BASE)
 #define STM32_TIM14     ((stm32_tim_t *)TIM14_BASE)
+#define STM32_TIM18     ((stm32_tim_t *)TIM18_BASE)
 /** @} */
 
 /*===========================================================================*/

@@ -8,6 +8,7 @@ PLATFORMSRC = ${CHIBIOS}/os/hal/platforms/STM32F30x/stm32_dma.c \
               ${CHIBIOS}/os/hal/platforms/STM32/gpt_lld.c \
               ${CHIBIOS}/os/hal/platforms/STM32/icu_lld.c \
               ${CHIBIOS}/os/hal/platforms/STM32/pwm_lld.c \
+	      ${CHIBIOS}/os/hal/platforms/STM32/DACv1/dac_lld.c \
               ${CHIBIOS}/os/hal/platforms/STM32/GPIOv2/pal_lld.c \
               ${CHIBIOS}/os/hal/platforms/STM32/I2Cv2/i2c_lld.c \
               ${CHIBIOS}/os/hal/platforms/STM32/RTCv2/rtc_lld.c \
@@ -19,6 +20,7 @@ PLATFORMSRC = ${CHIBIOS}/os/hal/platforms/STM32F30x/stm32_dma.c \
 # Required include directories
 PLATFORMINC = ${CHIBIOS}/os/hal/platforms/STM32F30x \
               ${CHIBIOS}/os/hal/platforms/STM32 \
+	      ${CHIBIOS}/os/hal/platforms/STM32/DACv1 \
               ${CHIBIOS}/os/hal/platforms/STM32/GPIOv2 \
               ${CHIBIOS}/os/hal/platforms/STM32/I2Cv2 \
               ${CHIBIOS}/os/hal/platforms/STM32/RTCv2 \
