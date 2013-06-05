@@ -88,6 +88,10 @@
 *** Releases                                                              ***
 *****************************************************************************
 
+*** 2.7.0 ***
+- FIX: Fixed MS2ST() and US2ST() macros error (bug #415)(backported to 2.6.0,
+  2.4.4, 2.2.10, NilRTOS).
+
 *** 2.5.2 ***
 - FIX: Fixed lwipthread.h should explicitly include lwip/opts.h (bug #414).
 - FIX: Fixed STM32_PLLI2SCLKOUT miscalculated (bug #413)(backported to 2.4.4).
