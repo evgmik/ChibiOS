@@ -89,8 +89,12 @@
 *****************************************************************************
 
 *** 2.7.0 ***
+- FIX: Fixed STM32 Serial (v2) driver invalid CR registers size (bug #416)
+  (backported to 2.6.0).
 - FIX: Fixed MS2ST() and US2ST() macros error (bug #415)(backported to 2.6.0,
   2.4.4, 2.2.10, NilRTOS).
+- NEW: SPI driver for SPC560Pxx, SPC563Mxx, SPC564Axx.
+- NEW: DMA-MUX support for SPC5xx devices.
 
 *** 2.5.2 ***
 - FIX: Fixed lwipthread.h should explicitly include lwip/opts.h (bug #414).
