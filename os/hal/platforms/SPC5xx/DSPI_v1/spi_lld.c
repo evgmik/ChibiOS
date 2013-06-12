@@ -78,6 +78,13 @@ SPIDriver SPID3;
 SPIDriver SPID4;
 #endif
 
+/**
+ * @brief   SPID5 driver identifier.
+ */
+#if SPC5_SPI_USE_DSPI4 || defined(__DOXYGEN__)
+SPIDriver SPID5;
+#endif
+
 /*===========================================================================*/
 /* Driver local variables and types.                                         */
 /*===========================================================================*/
@@ -185,6 +192,32 @@ static const edma_channel_config_t spi_dspi3_rx_dma_config = {
   spi_serve_rx_irq, spi_serve_dma_error_irq, &SPID4
 };
 #endif /* SPC5_SPI_USE_DSPI3 */
+
+#if SPC5_SPI_USE_DSPI4 || defined(__DOXYGEN__)
+/**
+ * @brief   DMA configuration for DSPI4 TX1.
+ */
+static const edma_channel_config_t spi_dspi4_tx1_dma_config = {
+  SPC5_DSPI4_TX1_DMA_DEV_ID, SPC5_SPI_DSPI4_DMA_PRIO, SPC5_SPI_DSPI4_DMA_IRQ_PRIO,
+  spi_serve_tx_irq, spi_serve_dma_error_irq, &SPID5
+};
+
+/**
+ * @brief   DMA configuration for DSPI4 TX2.
+ */
+static const edma_channel_config_t spi_dspi4_tx2_dma_config = {
+  SPC5_DSPI4_TX2_DMA_DEV_ID, SPC5_SPI_DSPI4_DMA_PRIO, SPC5_SPI_DSPI4_DMA_IRQ_PRIO,
+  spi_serve_tx_irq, spi_serve_dma_error_irq, &SPID5
+};
+
+/**
+ * @brief   DMA configuration for DSPI4 RX.
+ */
+static const edma_channel_config_t spi_dspi4_rx_dma_config = {
+  SPC5_DSPI4_RX_DMA_DEV_ID, SPC5_SPI_DSPI4_DMA_PRIO, SPC5_SPI_DSPI4_DMA_IRQ_PRIO,
+  spi_serve_rx_irq, spi_serve_dma_error_irq, &SPID5
+};
+#endif /* SPC5_SPI_USE_DSPI4 */
 
 /*===========================================================================*/
 /* Driver local functions.                                                   */
@@ -699,6 +732,35 @@ CH_IRQ_HANDLER(SPC5_DSPI3_TFFF_HANDLER) {
 }
 #endif /* SPC5_SPI_USE_DSPI3 */
 
+#if SPC5_SPI_USE_DSPI4 || defined(__DOXYGEN__)
+#if !defined(SPC5_DSPI4_TFFF_HANDLER)
+#error "SPC5_DSPI4_TFFF_HANDLER not defined"
+#endif
+/**
+ * @brief   DSPI4 TFFF interrupt handler.
+ *
+ * @isr
+ */
+CH_IRQ_HANDLER(SPC5_DSPI4_TFFF_HANDLER) {
+
+  CH_IRQ_PROLOGUE();
+
+  chSysLockFromIsr();
+
+  /* Interrupt served and back to DMA mode.*/
+  SPC5_DSPI4.RSER.B.TFFFDIRS = 1;
+  SPC5_DSPI4.SR.B.TFFF = 1;
+
+  /* Pushing last frame.*/
+  SPC5_DSPI4.PUSHR.R = (SPID5.config->pushr | SPID5.tx_last | SPC5_PUSHR_EOQ) &
+                        ~SPC5_PUSHR_CONT;
+
+  chSysUnlockFromIsr();
+
+  CH_IRQ_EPILOGUE();
+}
+#endif /* SPC5_SPI_USE_DSPI4 */
+
 /*===========================================================================*/
 /* Driver exported functions.                                                */
 /*===========================================================================*/
@@ -713,6 +775,7 @@ void spi_lld_init(void) {
 #if SPC5_SPI_USE_DSPI0
   /* Driver initialization.*/
   spiObjectInit(&SPID1);
+  SPC5_DSPI0_ENABLE_CLOCK();
   SPID1.dspi = &SPC5_DSPI0;
   SPID1.tx1_channel = EDMA_ERROR;
   SPID1.tx2_channel = EDMA_ERROR;
@@ -724,6 +787,7 @@ void spi_lld_init(void) {
 
 #if SPC5_SPI_USE_DSPI1
   /* Driver initialization.*/
+  SPC5_DSPI1_ENABLE_CLOCK();
   spiObjectInit(&SPID2);
   SPID2.dspi = &SPC5_DSPI1;
   SPID2.tx1_channel = EDMA_ERROR;
@@ -737,6 +801,7 @@ void spi_lld_init(void) {
 #if SPC5_SPI_USE_DSPI2
   /* Driver initialization.*/
   spiObjectInit(&SPID3);
+  SPC5_DSPI2_ENABLE_CLOCK();
   SPID3.dspi = &SPC5_DSPI2;
   SPID3.tx1_channel = EDMA_ERROR;
   SPID3.tx2_channel = EDMA_ERROR;
@@ -746,9 +811,10 @@ void spi_lld_init(void) {
   INTC.PSR[SPC5_DSPI2_TFFF_NUMBER].R = SPC5_SPI_DSPI2_IRQ_PRIO;
 #endif /* SPC5_SPI_USE_DSPI2 */
 
-#if SPC5_SPI_USE_DSPI03
+#if SPC5_SPI_USE_DSPI3
   /* Driver initialization.*/
   spiObjectInit(&SPID4);
+  SPC5_DSPI3_ENABLE_CLOCK();
   SPID4.dspi = &SPC5_DSPI3;
   SPID4.tx1_channel = EDMA_ERROR;
   SPID4.tx2_channel = EDMA_ERROR;
@@ -757,6 +823,19 @@ void spi_lld_init(void) {
                       SPC5_SPI_DSPI3_MCR;
   INTC.PSR[SPC5_DSPI3_TFFF_NUMBER].R = SPC5_SPI_DSPI3_IRQ_PRIO;
 #endif /* SPC5_SPI_USE_DSPI3 */
+
+#if SPC5_SPI_USE_DSPI4
+  /* Driver initialization.*/
+  spiObjectInit(&SPID5);
+  SPC5_DSPI4_ENABLE_CLOCK();
+  SPID5.dspi = &SPC5_DSPI4;
+  SPID5.tx1_channel = EDMA_ERROR;
+  SPID5.tx2_channel = EDMA_ERROR;
+  SPID5.rx_channel  = EDMA_ERROR;
+  SPC5_DSPI4.MCR.R  = SPC5_MCR_MSTR | SPC5_MCR_HALT | SPC5_MCR_MDIS |
+                      SPC5_SPI_DSPI4_MCR;
+  INTC.PSR[SPC5_DSPI4_TFFF_NUMBER].R = SPC5_SPI_DSPI4_IRQ_PRIO;
+#endif /* SPC5_SPI_USE_DSPI4 */
 }
 
 /**
@@ -776,7 +855,6 @@ void spi_lld_start(SPIDriver *spip) {
 
 #if SPC5_SPI_USE_DSPI0
     if (&SPID1 == spip) {
-      SPC5_DSPI0_ENABLE_CLOCK();
       spip->tx1_channel = edmaChannelAllocate(&spi_dspi0_tx1_dma_config);
       spip->tx2_channel = edmaChannelAllocate(&spi_dspi0_tx2_dma_config);
       spip->rx_channel = edmaChannelAllocate(&spi_dspi0_rx_dma_config);
@@ -785,7 +863,6 @@ void spi_lld_start(SPIDriver *spip) {
 
 #if SPC5_SPI_USE_DSPI1
     if (&SPID2 == spip) {
-      SPC5_DSPI1_ENABLE_CLOCK();
       spip->tx1_channel = edmaChannelAllocate(&spi_dspi1_tx1_dma_config);
       spip->tx2_channel = edmaChannelAllocate(&spi_dspi1_tx2_dma_config);
       spip->rx_channel = edmaChannelAllocate(&spi_dspi1_rx_dma_config);
@@ -794,7 +871,6 @@ void spi_lld_start(SPIDriver *spip) {
 
 #if SPC5_SPI_USE_DSPI2
     if (&SPID3 == spip) {
-      SPC5_DSPI2_ENABLE_CLOCK();
       spip->tx1_channel = edmaChannelAllocate(&spi_dspi2_tx1_dma_config);
       spip->tx2_channel = edmaChannelAllocate(&spi_dspi2_tx2_dma_config);
       spip->rx_channel = edmaChannelAllocate(&spi_dspi2_rx_dma_config);
@@ -803,17 +879,24 @@ void spi_lld_start(SPIDriver *spip) {
 
 #if SPC5_SPI_USE_DSPI3
     if (&SPID4 == spip) {
-      SPC5_DSPI3_ENABLE_CLOCK();
       spip->tx1_channel = edmaChannelAllocate(&spi_dspi3_tx1_dma_config);
       spip->tx2_channel = edmaChannelAllocate(&spi_dspi3_tx2_dma_config);
       spip->rx_channel = edmaChannelAllocate(&spi_dspi3_rx_dma_config);
     }
 #endif /* SPC5_SPI_USE_DSPI3 */
 
+#if SPC5_SPI_USE_DSPI4
+    if (&SPID5 == spip) {
+      spip->tx1_channel = edmaChannelAllocate(&spi_dspi4_tx1_dma_config);
+      spip->tx2_channel = edmaChannelAllocate(&spi_dspi4_tx2_dma_config);
+      spip->rx_channel = edmaChannelAllocate(&spi_dspi4_rx_dma_config);
+    }
+#endif /* SPC5_SPI_USE_DSPI5 */
+
     chDbgAssert((spip->tx1_channel != EDMA_ERROR) &&
                 (spip->tx2_channel != EDMA_ERROR) &&
                 (spip->rx_channel != EDMA_ERROR),
-                "spi_lld_start(), #3", "channel cannot be allocated");
+                "spi_lld_start(), #2", "channel cannot be allocated");
   }
 
   /* Configures the peripheral.*/
@@ -846,30 +929,6 @@ void spi_lld_stop(SPIDriver *spip) {
     spip->dspi->MCR.R     |= SPC5_MCR_HALT |
                              SPC5_MCR_CLR_TXF | SPC5_MCR_CLR_RXF;
     spip->dspi->MCR.B.MDIS = 1;
-
-#if SPC5_SPI_USE_DSPI0
-    if (&SPID1 == spip) {
-      SPC5_DSPI0_DISABLE_CLOCK();
-    }
-#endif /* SPC5_SPI_USE_DSPI0 */
-
-#if SPC5_SPI_USE_DSPI1
-    if (&SPID2 == spip) {
-      SPC5_DSPI1_DISABLE_CLOCK();
-    }
-#endif /* SPC5_SPI_USE_DSPI1 */
-
-#if SPC5_SPI_USE_DSPI2
-    if (&SPID3 == spip) {
-      SPC5_DSPI2_DISABLE_CLOCK();
-    }
-#endif /* SPC5_SPI_USE_DSPI2 */
-
-#if SPC5_SPI_USE_DSPI3
-    if (&SPID4 == spip) {
-      SPC5_DSPI3_DISABLE_CLOCK();
-    }
-#endif /* SPC5_SPI_USE_DSPI3 */
   }
 }
 
