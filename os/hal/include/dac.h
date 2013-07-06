@@ -35,17 +35,6 @@
 /* Driver constants.                                                         */
 /*===========================================================================*/
 
-/**
- * @name    DAC modes
- * @{
- */
-typedef enum {
-  DAC_MODE_ONESHOT = 0,             /**< Only send buffer once.    */
-  DAC_MODE_CONTINUOUS = 1,        /**< Send buffer continuously.    */
-  DAC_MODE_DOUBLEBUFFER = 2,      /**< Send both buffers continuously. */
-} dacmode_t;
-/** @} */
-
 /*===========================================================================*/
 /* Driver pre-compile time settings.                                         */
 /*===========================================================================*/
@@ -102,35 +91,6 @@ typedef enum {
 /*===========================================================================*/
 
 /**
- * @name    Macro Functions
- * @{
- */
-
-/**
- * @brief   Sends data over the DAC bus.
- * @details This asynchronous function starts a transmit operation.
- * @post    At the end of the operation the configured callback is invoked.
- *
- * @param[in] dacp      pointer to the @p DACDriver object
- * @param[in] n         number of words to send
- * @param[in] txbuf     the pointer to the transmit buffer
- *
- * @iclass
- */
-#define dacStartSendI(dacp) {                               \
-  (dacp)->state = DAC_ACTIVE;                              \
-  if ((dacp)->config->mode == DAC_MODE_ONESHOT) { \
-    dac_lld_send(dacp);                                            \
-    } \
-  else if ((dacp)->config->mode == DAC_MODE_CONTINUOUS) { \
-    dac_lld_send_continuous(dacp);                                            \
-    } \
-  else if ((dacp)->config->mode == DAC_MODE_DOUBLEBUFFER) { \
-    dac_lld_send_doublebuffer(dacp);                                            \
-    } \
-}
-
-/**
  * @name    Low Level driver helper macros
  * @{
  */
@@ -149,9 +109,39 @@ typedef enum {
  */
 #define _dac_wait_s(dacp) {                                                 \
   chDbgAssert((dacp)->thread == NULL,                                       \
-              "_dac_wait(), #1", "already waiting");                        \
+              "_dac_wait_s(), #1", "already waiting");                      \
   (dacp)->thread = chThdSelf();                                             \
   chSchGoSleepS(THD_STATE_SUSPENDED);                                       \
+}
+/**
+ * @brief   Resumes a thread waiting for a conversion completion.
+ *
+ * @param[in] dacp      pointer to the @p DACDriver object
+ *
+ * @notapi
+ */
+#define _dac_reset_i(dacp) {                                                \
+  if ((dacp)->thread != NULL) {                                             \
+    Thread *tp = (dacp)->thread;                                            \
+    (dacp)->thread = NULL;                                                  \
+    tp->p_u.rdymsg  = RDY_RESET;                                            \
+    chSchReadyI(tp);                                                        \
+  }                                                                         \
+}
+
+/**
+ * @brief   Resumes a thread waiting for a conversion completion.
+ *
+ * @param[in] dacp      pointer to the @p DACDriver object
+ *
+ * @notapi
+ */
+#define _dac_reset_s(dacp) {                                                \
+  if ((dacp)->thread != NULL) {                                             \
+    Thread *tp = (dacp)->thread;                                            \
+    (dacp)->thread = NULL;                                                  \
+    chSchWakeupS(tp, RDY_RESET);                                            \
+  }                                                                         \
 }
 
 /**
@@ -162,21 +152,64 @@ typedef enum {
  * @notapi
  */
 #define _dac_wakeup_isr(dacp) {                                             \
+  chSysLockFromIsr();                                                       \
   if ((dacp)->thread != NULL) {                                             \
-    Thread *tp = (dacp)->thread;                                            \
+    Thread *tp;                                                             \
+    tp = (dacp)->thread;                                                    \
     (dacp)->thread = NULL;                                                  \
-    chSysLockFromIsr();                                                     \
+    tp->p_u.rdymsg = RDY_OK;                                                \
     chSchReadyI(tp);                                                        \
-    chSysUnlockFromIsr();                                                   \
   }                                                                         \
+  chSysUnlockFromIsr();                                                     \
 }
+
+/**
+ * @brief   Wakes up the waiting thread with a timeout message.
+ *
+ * @param[in] dacp      pointer to the @p DACDriver object
+ *
+ * @notapi
+ */
+#define _dac_timeout_isr(dacp) {                                            \
+  chSysLockFromIsr();                                                       \
+  if ((dacp)->thread != NULL) {                                             \
+    Thread *tp;                                                             \
+    tp = (dacp)->thread;                                                    \
+    (dacp)->thread = NULL;                                                  \
+    tp->p_u.rdymsg = RDY_TIMEOUT;                                           \
+    chSchReadyI(tp);                                                        \
+  }                                                                         \
+  chSysUnlockFromIsr();                                                     \
+}
+
 #else /* !DAC_USE_WAIT */
 #define _dac_wait_s(dacp)
+#define _dac_reset_i(dacp)
+#define _dac_reset_s(dacp)
 #define _dac_wakeup_isr(dacp)
+#define _dac_timeout_isr(dacp)
 #endif /* !DAC_USE_WAIT */
 
 /**
- * @brief   Full transfer ISR code.
+ * @brief   Common ISR code, half buffer event.
+ * @details This code handles the portable part of the ISR code:
+ *          - Callback invocation.
+ *          .
+ * @note    This macro is meant to be used in the low level drivers
+ *          implementation only.
+ *
+ * @param[in] dacp      pointer to the @p DACDriver object
+ *
+ * @notapi
+ */
+#define _dac_isr_half_code(dacp) {                                          \
+  if ((dacp)->grpp->end_cb != NULL) {                                       \
+    (dacp)->grpp->end_cb(dacp, (dacp)->samples, (dacp)->depth / 2);         \
+  }                                                                         \
+}
+
+/**
+ * @brief   Common ISR code, full buffer event.
  * @details This code handles the portable part of the ISR code:
  *          - Callback invocation.
  *          - Waiting thread wakeup, if any.
@@ -189,60 +222,75 @@ typedef enum {
  *
  * @notapi
  */
-#define _dac_isr_full_code(dacp) {                                               \
-  if ((dacp)->config->callback) {                                             \
-    (dacp)->state = DAC_COMPLETE;                                           \
-    (dacp)->config->callback(dacp);                                           \
-    if ((dacp)->state == DAC_COMPLETE)                                      \
+#define _dac_isr_full_code(dacp) {                                          \
+  if ((dacp)->grpp->circular) {                                             \
+    /* Callback handling.*/                                                 \
+    if ((dacp)->grpp->end_cb != NULL) {                                     \
+      if ((dacp)->depth > 1) {                                              \
+        /* Invokes the callback passing the 2nd half of the buffer.*/       \
+        size_t half = (dacp)->depth / 2;                                    \
+        size_t half_index = half * (dacp)->grpp->num_channels;              \
+        (dacp)->grpp->end_cb(dacp, (dacp)->samples + half_index, half);     \
+      }                                                                     \
+      else {                                                                \
+        /* Invokes the callback passing the whole buffer.*/                 \
+        (dacp)->grpp->end_cb(dacp, (dacp)->samples, (dacp)->depth);         \
+      }                                                                     \
+    }                                                                       \
+  }                                                                         \
+  else {                                                                    \
+    /* End conversion.*/                                                    \
+    dac_lld_stop_conversion(dacp);                                          \
+    if ((dacp)->grpp->end_cb != NULL) {                                     \
+      (dacp)->state = DAC_COMPLETE;                                         \
+      if ((dacp)->depth > 1) {                                              \
+        /* Invokes the callback passing the 2nd half of the buffer.*/       \
+        size_t half = (dacp)->depth / 2;                                    \
+        size_t half_index = half * (dacp)->grpp->num_channels;              \
+        (dacp)->grpp->end_cb(dacp, (dacp)->samples + half_index, half);     \
+      }                                                                     \
+      else {                                                                \
+        /* Invokes the callback passing the whole buffer.*/                 \
+        (dacp)->grpp->end_cb(dacp, (dacp)->samples, (dacp)->depth);         \
+      }                                                                     \
+      if ((dacp)->state == DAC_COMPLETE) {                                  \
+        (dacp)->state = DAC_READY;                                          \
+        (dacp)->grpp = NULL;                                                \
+      }                                                                     \
+    }                                                                       \
+    else {                                                                  \
+      (dacp)->state = DAC_READY;                                            \
+      (dacp)->grpp = NULL;                                                  \
+    }                                                                       \
+    _dac_wakeup_isr(dacp);                                                  \
+  }                                                                         \
+}
+
+/**
+ * @brief   Common ISR code, error event.
+ * @details This code handles the portable part of the ISR code:
+ *          - Callback invocation.
+ *          - Waiting thread timeout signaling, if any.
+ *          - Driver state transitions.
+ *          .
+ * @note    This macro is meant to be used in the low level drivers
+ *          implementation only.
+ *
+ * @param[in] dacp      pointer to the @p DACDriver object
+ * @param[in] err       platform dependent error code
+ *
+ * @notapi
+ */
+#define _dac_isr_error_code(dacp, err) {                                    \
+  dac_lld_stop_conversion(dacp);                                            \
+  if ((dacp)->grpp->error_cb != NULL) {                                     \
+    (dacp)->state = DAC_ERROR;                                              \
+    (dacp)->grpp->error_cb(dacp, err);                                      \
+    if ((dacp)->state == DAC_ERROR)                                         \
       (dacp)->state = DAC_READY;                                            \
   }                                                                         \
-  else {                                                                      \
-    (dacp)->state = DAC_READY;                                              \
-  }                                                                         \
-  _dac_wakeup_isr(dacp);                                                  \
-}
-
-/**
- * @brief   Half transfer ISR code.
- * @details This code handles the portable part of the ISR code:
- *          - Callback invocation.
- *          - Waiting thread wakeup, if any.
- *          - Driver state transitions.
- *          .
- * @note    This macro is meant to be used in the low level drivers
- *          implementation only.
- *
- * @param[in] dacp      pointer to the @p DACDriver object
- *
- * @notapi
- */
-#define _dac_isr_half_code(dacp) {                                               \
-/* TODO */                                                                       \
-}
-/** @} */
-
-/**
- * @brief   Error handler ISR code.
- * @details This code handles the portable part of the ISR code:
- *          - Callback invocation.
- *          - Waiting thread wakeup, if any.
- *          - Driver state transitions.
- *          .
- * @note    This macro is meant to be used in the low level drivers
- *          implementation only.
- *
- * @param[in] dacp      pointer to the @p DACDriver object
- *
- * @notapi
- */
-#define _dac_isr_error_code(dacp) {                                               \
-  if ((dacp)->config->errcallback) {                                             \
-    (dacp)->state = DAC_ERROR;                                           \
-    (dacp)->config->errcallback(dacp); }                                           \
-  else {                                                                      \
-    (dacp)->state = DAC_ERROR;                                              \
-  }      \
-  _dac_wakeup_isr(dacp);                                                  \
+  (dacp)->grpp = NULL;                                                      \
+  _dac_timeout_isr(dacp);                                                   \
 }
 /** @} */
 
@@ -257,9 +305,15 @@ extern "C" {
   void dacObjectInit(DACDriver *dacp);
   void dacStart(DACDriver *dacp, const DACConfig *config);
   void dacStop(DACDriver *dacp);
-  void dacStartSend(DACDriver *dacp);
-#if DAC_USE_WAIT
-  void dacSend(DACDriver *dacp);
+  void dacStartConversion(DACDriver *dacp, const DACConversionGroup *grpp,
+                          const dacsample_t *samples, size_t depth);
+  void dacStartConversionI(DACDriver *dacp, const DACConversionGroup *grpp,
+                           const dacsample_t *samples, size_t depth);
+  void dacStopConversion(DACDriver *dacp);
+  void dacStopConversionI(DACDriver *dacp);
+#if DAC_USE_WAIT || defined(__DOXYGEN__)
+  msg_t dacConvert(DACDriver *dacp, const DACConversionGroup *grpp,
+                   const dacsample_t *samples, size_t depth);
 #endif /* DAC_USE_WAIT */
 #if DAC_USE_MUTUAL_EXCLUSION
   void dacAcquireBus(DACDriver *dacp);

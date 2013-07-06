@@ -15,7 +15,7 @@
 */
 
 /**
- * @file    SPC5xx/edma.h
+ * @file    SPC5xx/spc5_edma.h
  * @brief   EDMA helper driver header.
  *
  * @addtogroup SPC5xx_EDMA
@@ -35,6 +35,30 @@
  * @brief   EDMA channel allocation error.
  */
 #define EDMA_ERROR                  -1
+
+/**
+ * @name    EDMA CR register definitions
+ * @{
+ */
+#define EDMA_CR_CX                  (1U << 17)
+#define EDMA_CR_ECX                 (1U << 16)
+#define EDMA_CR_GRP3PRI_MASK        (3U << 14)
+#define EDMA_CR_GRP3PRI(n)          ((n) << 14)
+#define EDMA_CR_GRP2PRI_MASK        (3U << 12)
+#define EDMA_CR_GRP2PRI(n)          ((n) << 12)
+#define EDMA_CR_GRP1PRI_MASK        (3U << 10)
+#define EDMA_CR_GRP1PRI(n)          ((n) << 10)
+#define EDMA_CR_GRP0PRI_MASK        (3U << 8)
+#define EDMA_CR_GRP0PRI(n)          ((n) << 8)
+#define EDMA_CR_EMLM                (1U << 7)
+#define EDMA_CR_CLM                 (1U << 6)
+#define EDMA_CR_HALT                (1U << 5)
+#define EDMA_CR_HOE                 (1U << 4)
+#define EDMA_CR_ERGA                (1U << 3)
+#define EDMA_CR_ERCA                (1U << 2)
+#define EDMA_CR_EDBG                (1U << 1)
+#define EDMA_CR_EBW                 (1U << 0)
+/** @} */
 
 /**
  * @name    EDMA mode constants
@@ -62,14 +86,43 @@
  * @brief   Default EDMA CR register initialization.
  */
 #if !defined(SPC5_EDMA_ERROR_HANDLER) || defined(__DOXYGEN__)
-#define SPC5_EDMA_CR_SETTING                0x0000C400
+#define SPC5_EDMA_CR_SETTING                (EDMA_CR_GRP3PRI(3) |           \
+                                             EDMA_CR_GRP2PRI(2) |           \
+                                             EDMA_CR_GRP1PRI(1) |           \
+                                             EDMA_CR_GRP0PRI(0) |           \
+                                             EDMA_CR_ERGA)
 #endif
 
 /**
- * @brief   EDMA critical error handler, must not return.
+ * @brief   Static priorities for channels group 0.
  */
-#if !defined(SPC5_EDMA_ERROR_HANDLER) || defined(__DOXYGEN__)
-#define SPC5_EDMA_ERROR_HANDLER()           chSysHalt()
+#if !defined(SPC5_EDMA_GROUP0_PRIORITIES) || defined(__DOXYGEN__)
+#define SPC5_EDMA_GROUP0_PRIORITIES                                         \
+  0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15
+#endif
+
+/**
+ * @brief   Static priorities for channels group 1.
+ */
+#if !defined(SPC5_EDMA_GROUP1_PRIORITIES) || defined(__DOXYGEN__)
+#define SPC5_EDMA_GROUP1_PRIORITIES                                         \
+  0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15
+#endif
+
+/**
+ * @brief   Static priorities for channels group 2.
+ */
+#if !defined(SPC5_EDMA_GROUP2_PRIORITIES) || defined(__DOXYGEN__)
+#define SPC5_EDMA_GROUP2_PRIORITIES                                         \
+  0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15
+#endif
+
+/**
+ * @brief   Static priorities for channels group 3.
+ */
+#if !defined(SPC5_EDMA_GROUP3_PRIORITIES) || defined(__DOXYGEN__)
+#define SPC5_EDMA_GROUP3_PRIORITIES                                         \
+  0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15
 #endif
 
 /**
@@ -77,6 +130,24 @@
  */
 #if !defined(SPC5_EDMA_ERROR_IRQ_PRIO) || defined(__DOXYGEN__)
 #define SPC5_EDMA_ERROR_IRQ_PRIO            12
+#endif
+
+/**
+ * @brief   EDMA peripheral configuration when started.
+ * @note    The default configuration is 1 (always run) in run mode and
+ *          2 (only halt) in low power mode. The defaults of the run modes
+ *          are defined in @p hal_lld.h.
+ */
+#if !defined(SPC5_EDMA_MUX_START_PCTL) || defined(__DOXYGEN__)
+#define SPC5_EDMA_MUX_START_PCTL            (SPC5_ME_PCTL_RUN(1) |          \
+                                             SPC5_ME_PCTL_LP(2))
+#endif
+
+/**
+ * @brief   EDMA critical error handler, must not return.
+ */
+#if !defined(SPC5_EDMA_ERROR_HANDLER) || defined(__DOXYGEN__)
+#define SPC5_EDMA_ERROR_HANDLER()           chSysHalt()
 #endif
 
 /*===========================================================================*/
@@ -609,6 +680,22 @@ typedef struct {
   edma_tcd_t TCD[64];
 } edma_t;
 
+#if SPC5_EDMA_HAS_MUX || defined(__DOXYGEN__)
+/**
+ * @brief   Type of a DMA-MUX peripheral.
+ */
+typedef struct {
+  union {
+    vuint8_t R;
+    struct {
+      vuint8_t ENBL:1;
+      vuint8_t TRIG:1;
+      vuint8_t SOURCE:6;
+    } B;
+  } CHCONFIG[SPC5_EDMA_NCHANNELS];
+} dma_mux_t;
+#endif /* SPC5_EDMA_HAS_MUX */
+
 /**
  * @brief   DMA callback type.
  *
@@ -632,10 +719,11 @@ typedef void (*edma_error_callback_t)(edma_channel_t channel,
  * @brief   Type of an EDMA channel configuration structure.
  */
 typedef struct {
+  edma_channel_t        dma_channel;    /**< @brief Channel to be allocated.*/
+#if SPC5_EDMA_HAS_MUX || defined(__DOXYGEN__)
   uint8_t               dma_periph;     /**< @brief Peripheral to be
                                              associated to the channel.     */
-  uint8_t               dma_prio;       /**< @brief Priority register value
-                                             for this channel.              */
+#endif
   uint8_t               dma_irq_prio;   /**< @brief IRQ priority level for
                                              this channel.                  */
   edma_callback_t       dma_func;       /**< @brief Channel callback,
@@ -650,11 +738,16 @@ typedef struct {
 /*===========================================================================*/
 
 /**
- * @name    eDMA units references
+ * @name    Peripherals references
+ *
  * @{
  */
 #if SPC5_HAS_EDMA || defined(__DOXYGEN__)
 #define SPC5_EDMA       (*(edma_t *)0xFFF44000U)
+#endif
+
+#if SPC5_EDMA_HAS_MUX || defined(__DOXYGEN__)
+#define SPC5_DMAMUX     (*(dma_mux_t *)0xFFFDC000UL)
 #endif
 /** @} */
 

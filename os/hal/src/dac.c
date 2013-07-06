@@ -132,51 +132,161 @@ void dacStop(DACDriver *dacp) {
 }
 
 /**
- * @brief   Sends data over the DAC bus.
- * @details This asynchronous function starts a one-shot transmit operation.
- * @post    At the end of the operation the configured callback is invoked.
+ * @brief   Starts a DAC conversion.
+ * @details Starts an asynchronous conversion operation.
+ * @note    The buffer is organized as a matrix of M*N elements where M is the
+ *          channels number configured into the conversion group and N is the
+ *          buffer depth. The samples are sequentially written into the buffer
+ *          with no gaps.
  *
  * @param[in] dacp      pointer to the @p DACDriver object
- * @param[in] n         number of words to send
- * @param[in] txbuf     the pointer to the transmit buffer
+ * @param[in] grpp      pointer to a @p DACConversionGroup object
+ * @param[in] samples   pointer to the samples buffer
+ * @param[in] depth     buffer depth (matrix rows number). The buffer depth
+ *                      must be one or an even number.
  *
  * @api
  */
-void dacStartSend(DACDriver *dacp) {
-
-  chDbgCheck((dacp != NULL), "dacStartSend");
+void dacStartConversion(DACDriver *dacp,
+                        const DACConversionGroup *grpp,
+                        const dacsample_t *samples,
+                        size_t depth) {
 
   chSysLock();
-  chDbgAssert(dacp->state == DAC_READY, "dacStartSend(), #1", "not ready");
-  dacStartSendI(dacp);
+  dacStartConversionI(dacp, grpp, samples, depth);
   chSysUnlock();
 }
 
-#if DAC_USE_WAIT || defined(__DOXYGEN__)
-
 /**
- * @brief   Sends data over the DAC bus.
- * @details This synchronous function performs a transmit operation.
- * @pre     In order to use this function the option @p DAC_USE_WAIT must be
- *          enabled.
- * @pre     In order to use this function the driver must have been configured
- *          without callbacks (@p callback = @p NULL).
+ * @brief   Starts a DAC conversion.
+ * @details Starts an asynchronous conversion operation.
+ * @post    The callbacks associated to the conversion group will be invoked
+ *          on buffer fill and error events.
+ * @note    The buffer is organized as a matrix of M*N elements where M is the
+ *          channels number configured into the conversion group and N is the
+ *          buffer depth. The samples are sequentially written into the buffer
+ *          with no gaps.
  *
  * @param[in] dacp      pointer to the @p DACDriver object
- * @param[in] n         number of words to send
- * @param[in] txbuf     the pointer to the transmit buffer
+ * @param[in] grpp      pointer to a @p DACConversionGroup object
+ * @param[in] samples   pointer to the samples buffer
+ * @param[in] depth     buffer depth (matrix rows number). The buffer depth
+ *                      must be one or an even number.
+ *
+ * @iclass
+ */
+void dacStartConversionI(DACDriver *dacp,
+                         const DACConversionGroup *grpp,
+                         const dacsample_t *samples,
+                         size_t depth) {
+
+  chDbgCheckClassI();
+  chDbgCheck((dacp != NULL) && (grpp != NULL) && (samples != NULL) &&
+             ((depth == 1) || ((depth & 1) == 0)),
+             "dacStartConversionI");
+  chDbgAssert((dacp->state == DAC_READY) ||
+              (dacp->state == DAC_COMPLETE) ||
+              (dacp->state == DAC_ERROR),
+              "dacStartConversionI(), #1", "not ready");
+
+  dacp->samples  = samples;
+  dacp->depth    = depth;
+  dacp->grpp     = grpp;
+  dacp->state    = DAC_ACTIVE;
+  dac_lld_start_conversion(dacp);
+}
+
+/**
+ * @brief   Stops an ongoing conversion.
+ * @details This function stops the currently ongoing conversion and returns
+ *          the driver in the @p DAC_READY state. If there was no conversion
+ *          being processed then the function does nothing.
+ *
+ * @param[in] dacp      pointer to the @p DACDriver object
  *
  * @api
  */
-void dacSend(DACDriver *dacp) {
+void dacStopConversion(DACDriver *dacp) {
 
-  chDbgCheck((dacp != NULL), "dacSend");
+  chDbgCheck(dacp != NULL, "dacStopConversion");
+
   chSysLock();
-  chDbgAssert(dacp->state == DAC_READY, "dacSend(), #1", "not ready");
-  chDbgAssert(dacp->config->callback == NULL, "dacSend(), #2", "has callback");
-  dacStartSendI(dacp);
-  _dac_wait_s(dacp);
+  chDbgAssert((dacp->state == DAC_READY) ||
+              (dacp->state == DAC_ACTIVE),
+              "dacStopConversion(), #1", "invalid state");
+  if (dacp->state != DAC_READY) {
+    dac_lld_stop_conversion(dacp);
+    dacp->grpp  = NULL;
+    dacp->state = DAC_READY;
+    _dac_reset_s(dacp);
+  }
   chSysUnlock();
+}
+
+/**
+ * @brief   Stops an ongoing conversion.
+ * @details This function stops the currently ongoing conversion and returns
+ *          the driver in the @p DAC_READY state. If there was no conversion
+ *          being processed then the function does nothing.
+ *
+ * @param[in] dacp      pointer to the @p DACDriver object
+ *
+ * @iclass
+ */
+void dacStopConversionI(DACDriver *dacp) {
+
+  chDbgCheckClassI();
+  chDbgCheck(dacp != NULL, "dacStopConversionI");
+  chDbgAssert((dacp->state == DAC_READY) ||
+              (dacp->state == DAC_ACTIVE) ||
+              (dacp->state == DAC_COMPLETE),
+              "dacStopConversionI(), #1", "invalid state");
+
+  if (dacp->state != DAC_READY) {
+    dac_lld_stop_conversion(dacp);
+    dacp->grpp  = NULL;
+    dacp->state = DAC_READY;
+    _dac_reset_i(dacp);
+  }
+}
+
+#if DAC_USE_WAIT || defined(__DOXYGEN__)
+/**
+ * @brief   Performs a DAC conversion.
+ * @details Performs a synchronous conversion operation.
+ * @note    The buffer is organized as a matrix of M*N elements where M is the
+ *          channels number configured into the conversion group and N is the
+ *          buffer depth. The samples are sequentially written into the buffer
+ *          with no gaps.
+ *
+ * @param[in] dacp      pointer to the @p DACDriver object
+ * @param[in] grpp      pointer to a @p DACConversionGroup object
+ * @param[out] samples  pointer to the samples buffer
+ * @param[in] depth     buffer depth (matrix rows number). The buffer depth
+ *                      must be one or an even number.
+ * @return              The operation result.
+ * @retval RDY_OK       Conversion finished.
+ * @retval RDY_RESET    The conversion has been stopped using
+ *                      @p acdStopConversion() or @p acdStopConversionI(),
+ *                      the result buffer may contain incorrect data.
+ * @retval RDY_TIMEOUT  The conversion has been stopped because an hardware
+ *                      error.
+ *
+ * @api
+ */
+msg_t dacConvert(DACDriver *dacp,
+                 const DACConversionGroup *grpp,
+                 const dacsample_t *samples,
+                 size_t depth) {
+  msg_t msg;
+
+  chSysLock();
+  chDbgAssert(dacp->thread == NULL, "dacConvert(), #1", "already waiting");
+  dacStartConversionI(dacp, grpp, samples, depth);
+  _dac_wait_s(dacp);
+  msg = chThdSelf()->p_u.rdymsg;
+  chSysUnlock();
+  return msg;
 }
 #endif /* DAC_USE_WAIT */
 
