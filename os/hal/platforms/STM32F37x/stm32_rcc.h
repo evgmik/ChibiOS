@@ -795,6 +795,32 @@
 /** @} */
 
 /**
+ * @brief   Enables the TIM18 peripheral clock.
+ *
+ * @param[in] lp        low power enable flag
+ *
+ * @api
+ */
+#define rccEnableTIM18(lp) rccEnableAPB1(RCC_APB1ENR_TIM18EN, lp)
+
+/**
+ * @brief   Disables the TIM18 peripheral clock.
+ *
+ * @param[in] lp        low power enable flag
+ *
+ * @api
+ */
+#define rccDisableTIM18(lp) rccDisableAPB1(RCC_APB1ENR_TIM18EN, lp)
+
+/**
+ * @brief   Resets the TIM18 peripheral.
+ *
+ * @api
+ */
+#define rccResetTIM18() rccResetAPB1(RCC_APB1RSTR_TIM18RST)
+/** @} */
+
+/**
  * @name    USART/UART peripherals specific RCC operations
  * @{
  */
