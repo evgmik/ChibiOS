@@ -19,6 +19,7 @@ PLATFORMSRC = ${CHIBIOS}/os/hal/platforms/STM32L1xx/stm32_dma.c \
 # Required include directories
 PLATFORMINC = ${CHIBIOS}/os/hal/platforms/STM32L1xx \
               ${CHIBIOS}/os/hal/platforms/STM32 \
+              ${CHIBIOS}/os/hal/platforms/STM32/DACv1 \
               ${CHIBIOS}/os/hal/platforms/STM32/GPIOv2 \
               ${CHIBIOS}/os/hal/platforms/STM32/I2Cv1 \
               ${CHIBIOS}/os/hal/platforms/STM32/RTCv2 \
