@@ -229,6 +229,11 @@
 typedef struct DACDriver DACDriver;
 
 /**
+ * @brief   Type representing a DAC sample.
+ */
+typedef uint16_t dacsample_t;
+
+/**
  * @brief   DAC notification callback type.
  *
  * @param[in] dacp      pointer to the @p DACDriver object triggering the
@@ -247,44 +252,38 @@ typedef enum {
 #endif
 } dacdhrmode_t;
 
+/**
+ * @brief   DAC Conversion group structure.
+ */
+typedef struct {
+  /**
+   * @brief Number of DAC channels.
+   */
+  uint16_t              num_channels;
+  /**
+   * @brief Operation complete callback or @p NULL.
+   */
+  daccallback_t     end_cb;
+  /**
+   * @brief Error handling callback or @p NULL.
+   */
+  daccallback_t      error_cb;
+  
+} DACConversionGroup;
 
 /**
  * @brief   Driver configuration structure.
  */
 typedef struct {
   /**
-   * @brief   DAC mode selection.
-   */
-  dacmode_t                 mode;
-  /**
    * @brief   Timer frequency in Hz.
    */
   uint32_t                  frequency;
-  /**
-   * @brief   Transmission buffer 1 pointer.
-   */
-  const void                *buffer1;
-  /**
-   * @brief   Transmission buffer 2 pointer.
-   */
-  const void                *buffer2;
-  /**
-   * @brief   Transmission buffers size in number of samples.
-   */
-  size_t                    buffers_size;
-  /**
-   * @brief Operation complete callback or @p NULL.
-   */
-  daccallback_t             callback;
-  /**
-   * @brief Error handling callback or @p NULL.
-   */
-  daccallback_t             errcallback;
   /* End of the mandatory fields.*/
   /**
    * @brief   DAC data holding register mode.
    */
-  dacdhrmode_t               dhrm;
+  dacdhrmode_t       dhrm;
   /**
    * @brief DAC initialization data.
    */
@@ -299,6 +298,18 @@ struct DACDriver {
    * @brief Driver state.
    */
   dacstate_t                state;
+  /**
+   * @brief Conversion group.
+   */
+  const DACConversionGroup *grpp;
+  /**
+   * @brief Samples buffer pointer.
+   */
+  const dacsample_t *samples;
+  /**
+   * @brief Samples buffer size.
+   */
+  uint16_t depth;
   /**
    * @brief Current configuration data.
    */
@@ -375,9 +386,8 @@ extern "C" {
   void dac_lld_init(void);
   void dac_lld_start(DACDriver *dacp);
   void dac_lld_stop(DACDriver *dacp);
-  void dac_lld_send(DACDriver *dacp);
-  void dac_lld_send_continuous(DACDriver *dacp);
-  void dac_lld_send_doublebuffer(DACDriver *dacp);
+  void dac_lld_start_conversion(DACDriver *dacp);
+  void dac_lld_stop_conversion(DACDriver *dacp);
 #ifdef __cplusplus
 }
 #endif
