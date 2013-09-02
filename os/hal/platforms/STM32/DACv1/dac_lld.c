@@ -92,16 +92,16 @@ static void dac_lld_serve_tx_interrupt(DACDriver *dacp, uint32_t flags) {
   (void)dacp;
   if ((flags & (STM32_DMA_ISR_TEIF | STM32_DMA_ISR_DMEIF)) != 0) {
     /* DMA errors handling.*/
-    _dac_isr_error_code(dacp);
+    //~ _dac_isr_error_code(dacp, flags);
   }
   else {
     if ((flags & STM32_DMA_ISR_HTIF) != 0) {
       /* Half transfer processing.*/
-      _dac_isr_half_code(dacp);
+      //~ _dac_isr_half_code(dacp);
     }
     if ((flags & STM32_DMA_ISR_TCIF) != 0) {
       /* Transfer complete processing.*/
-      _dac_isr_full_code(dacp);
+      //~ _dac_isr_full_code(dacp);
     }
   }
 #else
@@ -282,7 +282,7 @@ void dac_lld_start(DACDriver *dacp) {
 #endif
   }
   
-  dacp->dac->CR |= trgo << regshift; /* Enable trigger */
+  dacp->dac->CR |= trgo << regshift; /* Enable timer trigger */
 #endif
   }
 }
@@ -339,42 +339,14 @@ void dac_lld_stop(DACDriver *dacp) {
  *
  * @notapi
  */
-void dac_lld_send(DACDriver *dacp) {
-  chDbgAssert(dacp->config->buffer1, "dac_lld_send_doublebuffer(), #1", 
-    "First buffer is NULL pointer");
-  dmaStreamSetMemory0(dacp->dma, dacp->config->buffer1);
-  dmaStreamSetTransactionSize(dacp->dma, dacp->config->buffers_size);
-  dmaStreamSetMode(dacp->dma, dacp->dmamode | STM32_DMA_CR_EN);
+void dac_lld_start_conversion(DACDriver *dacp) {
+  chDbgAssert(dacp->samples, "dac_lld_start_conversion(), #1", 
+    "dacp->samples is NULL pointer");
+  dmaStreamSetMemory0(dacp->dma, dacp->samples);
+  dmaStreamSetTransactionSize(dacp->dma, dacp->depth);
+  dmaStreamSetMode(dacp->dma, dacp->dmamode | STM32_DMA_CR_EN |
+  STM32_DMA_CR_CIRC);
 }
-
-void dac_lld_send_continuous(DACDriver *dacp){
-  chDbgAssert(dacp->config->buffer1, "dac_lld_send_doublebuffer(), #1", 
-    "First buffer is NULL pointer");
-  dmaStreamSetMemory0(dacp->dma, dacp->config->buffer1);
-  dmaStreamSetTransactionSize(dacp->dma, dacp->config->buffers_size);
-  dmaStreamSetMode(dacp->dma, dacp->dmamode | STM32_DMA_CR_EN |                \
-                   STM32_DMA_CR_CIRC);
-}
-#if defined(STM32_ADVANCED_DMA) && STM32_ADVANCED_DMA
-void dac_lld_send_doublebuffer(DACDriver *dacp) {
-  chDbgAssert(dacp->config->buffer1, "dac_lld_send_doublebuffer(), #1", 
-    "First buffer is NULL pointer");
-  chDbgAssert(dacp->config->buffer1, "dac_lld_send_doublebuffer(), #2", 
-    "Second buffer is NULL pointer");
-  dmaStreamSetMemory0(dacp->dma, dacp->config->buffer1);
-  dmaStreamSetMemory1(dacp->dma, dacp->config->buffer2);
-  dmaStreamSetTransactionSize(dacp->dma, dacp->config->buffers_size);
-  dmaStreamSetMode(dacp->dma, dacp->dmamode | STM32_DMA_CR_EN |               \
-                   STM32_DMA_CR_DBM);
-}
-#else
-void dac_lld_send_doublebuffer(DACDriver *dacp) { 
-  (void)dacp;
-  chDbgAssert(0, "dac_lld_send_doublebuffer(), #1", 
-    "This DMA mode is not supported by your hardware.");
-};
-#endif
-
 #endif /* HAL_USE_DAC */
 
 /** @} */
