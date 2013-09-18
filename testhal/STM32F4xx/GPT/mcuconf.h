@@ -60,6 +60,7 @@
 #define STM32_VOS                           STM32_VOS_HIGH
 #define STM32_PVD_ENABLE                    FALSE
 #define STM32_PLS                           STM32_PLS_LEV0
+#define STM32_BKPRAM_ENABLE                 FALSE
 
 /*
  * ADC driver system settings.
@@ -113,7 +114,7 @@
 #define STM32_GPT_USE_TIM3                  TRUE
 #define STM32_GPT_USE_TIM4                  TRUE
 #define STM32_GPT_USE_TIM5                  TRUE
-#define STM32_GPT_USE_TIM8                  TRUE
+#define STM32_GPT_USE_TIM6                  TRUE
 #define STM32_GPT_USE_TIM7                  TRUE
 #define STM32_GPT_USE_TIM8                  TRUE
 #define STM32_GPT_USE_TIM9                  TRUE

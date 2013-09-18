@@ -38,21 +38,34 @@
 /*
  * PWM driver system settings.
  */
+#define AVR_PWM_USE_TIM1                   FALSE
+#define AVR_PWM_USE_TIM2                   FALSE
+#define AVR_PWM_USE_TIM3                   FALSE
+#define AVR_PWM_USE_TIM4                   FALSE
+#define AVR_PWM_USE_TIM5                   FALSE
+
+/*
+ * ICU driver system settings.
+ */
+#define AVR_ICU_USE_TIM1                   FALSE
+#define AVR_ICU_USE_TIM3                   FALSE
+#define AVR_ICU_USE_TIM4                   FALSE
+#define AVR_ICU_USE_TIM5                   FALSE
 
 /*
  * GPT driver system settings.
  */
-#define AVR_GPT_USE_GPT1                   FALSE
-#define AVR_GPT_USE_GPT2                   FALSE
-#define AVR_GPT_USE_GPT3                   FALSE
-#define AVR_GPT_USE_GPT4                   FALSE
-#define AVR_GPT_USE_GPT5                   FALSE
+#define AVR_GPT_USE_TIM1                   FALSE
+#define AVR_GPT_USE_TIM2                   FALSE
+#define AVR_GPT_USE_TIM3                   FALSE
+#define AVR_GPT_USE_TIM4                   FALSE
+#define AVR_GPT_USE_TIM5                   FALSE
 
 /*
  * SERIAL driver system settings.
  */
 #define AVR_SERIAL_USE_USART0              TRUE
-#define AVR_SERIAL_USE_USART1              FALSE
+#define AVR_SERIAL_USE_USART1              TRUE
 
 /*
  * I2C driver system settings.
