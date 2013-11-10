@@ -67,7 +67,7 @@
 /*
  * DAC driver system settings.
  */
-#define STM32_DAC_USE_CHN1                  TRUE
+#define STM32_DAC_USE_CHN1                  FALSE
 #define STM32_DAC_USE_CHN2                  TRUE
 #define STM32_DAC_CHN1_IRQ_PRIORITY         10
 #define STM32_DAC_CHN2_IRQ_PRIORITY         10
