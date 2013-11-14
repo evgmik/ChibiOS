@@ -50,19 +50,18 @@ const uint16_t dac_buffer[DAC_BUFFER_SIZE] = {2047, 2082, 2118, 2154, 2189, 2225
 		1657, 1692, 1727, 1763, 1798, 1834, 1869, 1905, 1940, 1976, 2012};
 
 /*
- * Turn on the orange LED once DMA ends the transmission.
+ * Do nothing (since board does not have enough LEDs) once DMA ends the transmission.
  */
 static void daccb(DACDriver *dacp) {
   (void)dacp;
-  /*palTogglePad(GPIOC, GPIOC_LED3); // Orange*/
 }
 
 /*
- * Turn on the red LED if there are DMA errors.
+ * Turn on the blue LED if there are DMA errors.
  */
 static void dacerrcb(DACDriver *dacp) {
   (void)dacp;
-  //palTogglePad(GPIOC, GPIOC_LED4); // Red
+  palTogglePad(GPIOB, GPIOB_LED4); // Blue
 }
 
 /*
@@ -85,7 +84,7 @@ static const DACConfig daccfg = {
 };
 
 /*
- * Blue LEDs blinker thread, times are in milliseconds.
+ * Green LEDs blinker thread, times are in milliseconds.
  */
 static WORKING_AREA(waThread1, 128);
 static msg_t Thread1(void *arg) {
@@ -93,9 +92,9 @@ static msg_t Thread1(void *arg) {
   (void)arg;
   chRegSetThreadName("blinker");
   while (TRUE) {
-    palSetPad(GPIOB, GPIOB_LED4);
+    palSetPad(GPIOB, GPIOB_LED3);
     chThdSleepMilliseconds(500);
-    palClearPad(GPIOB, GPIOB_LED4);
+    palClearPad(GPIOB, GPIOB_LED3);
     chThdSleepMilliseconds(500);
   }
 }
