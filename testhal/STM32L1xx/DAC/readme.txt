@@ -12,7 +12,8 @@ The application demonstrates the use of the STM32L1xx DAC driver.
 
 ** Board Setup **
 
-None.
+None. Hock up oscilloscope to the PA5 pin which is output of DAC channel2,
+observe sinusoid with 1 kHz frequency.
 
 ** Build Procedure **
 
