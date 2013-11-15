@@ -19,8 +19,8 @@
 */
 
 /**
- * @file    STM32F37x/dac_lld.h
- * @brief   STM32F37x DAC subsystem low level driver header.
+ * @file    STM32/DACv1/dac_lld.h
+ * @brief   STM32 DAC subsystem low level driver header.
  *
  * @addtogroup DAC
  * @{
